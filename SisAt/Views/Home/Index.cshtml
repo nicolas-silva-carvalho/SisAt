@@ -1,0 +1,82 @@
+﻿@model UsuarioRequestDto;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<section class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="#"><b>SIS</b>AT</a>
+        </div>
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Login de Acesso</p>
+                <form method="post" asp-action="Index" asp-controller="Home">
+                    <div class="input-group mb-3">
+                        <input type="email" asp-for="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" id="Email" placeholder="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Email, "", new { @class = "invalid-feedback" })
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" asp-for="Senha" class="form-control @(ViewData.ModelState["Senha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Senha">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(x => x.Senha, "", new { @class = "invalid-feedback" })
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block">ACESSAR O SISTEMA</button>
+                        </div>
+                    </div>
+
+                    <div class="social-auth-links text-center mb-3">
+                        
+                    </div>
+                    <!-- /.social-auth-links -->
+
+                    <p class="mb-1">
+                        <a href="forgot-password.html">Esqueci a senha</a>
+                    </p>
+                    <p class="mb-0">
+                        <a asp-controller="Home" asp-action="RegistrarUsuario" class="text-center">Registrar novo usuário</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        var toastrMessage = TempData["Error"] as string;
+        var toastrMessageSuccess = TempData["ToastrMessageSuccess"] as string;
+    }
+
+    @if (!string.IsNullOrEmpty(toastrMessage))
+    {
+        <script>
+            toastr.error('@toastrMessage', 'Erro', {
+                closeButton: true,
+                progressBar: true
+            });
+        </script>
+    }
+
+    @if (!string.IsNullOrEmpty(toastrMessageSuccess))
+    {
+        <script>
+            toastr.success('@toastrMessageSuccess', 'Sucesso.', {
+                closeButton: true,
+                progressBar: true
+            });
+        </script>
+    }
+}

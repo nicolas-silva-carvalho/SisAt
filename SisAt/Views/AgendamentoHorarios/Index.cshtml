@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "Ínicio";
+}
+
+<div class="wrapper">
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a class="nav-link" style="font-weight:700;color:#6c757d!important">SISAT - Sistema de Atendimento</a>
+            </li>
+        </ul>
+    </nav>
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a class="brand-link">
+            <div class="text-center d-flex justify-content-center">
+                <img src="/Imagens/logoW2e2.png" alt="W2E Soluções Logo" class="brand-image" style="width:90px">
+            </div>
+        </a>
+        <div class="sidebar">
+            <div class="form-inline mt-2">
+                <div class="input-group" data-widget="sidebar-search">
+                    <input class="form-control form-control-sidebar" type="search" placeholder="Pesquisar" aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-sidebar">
+                            <i class="fas fa-search fa-fw"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Inicio" ? "menu-open" : "")">
+                        <a class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>
+                                Início
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Plantao" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Plantao" ? "active" : "")">
+                            <i class="nav-icon fas fa-pencil-alt"></i>
+                            <p>
+                                Horários
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item @(ViewBag.ActivePage == "" ? "active"  : "")">
+                                <a class="nav-link @(ViewBag.ActivePage == "" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Controle de Plantões</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>@ViewData["Title"]</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h4>Cadastro de Horários</h4>
+
+                                <p>Acessar</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <a asp-action="CadastroDeHorarios" asp-controller="AgendamentoHorarios" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="main-footer">
+        <strong>&copy; @DateTime.Now.Year - W2E Soluções</strong>
+    </footer>
+</div>
+
+@section Scripts {
+    @{
+        var toastrMessage = TempData["Error"] as string;
+        var toastrMessageSuccess = TempData["Sucesso"] as string;
+    }
+
+    @if (!string.IsNullOrEmpty(toastrMessage))
+    {
+        <script>
+            toastr.error('@toastrMessage', 'Erro', {
+                closeButton: true,
+                progressBar: true
+            });
+        </script>
+    }
+
+    @if (!string.IsNullOrEmpty(toastrMessageSuccess))
+    {
+        <script>
+            toastr.success('@toastrMessageSuccess', 'Sucesso.', {
+                closeButton: true,
+                progressBar: true
+            });
+        </script>
+    }
+}

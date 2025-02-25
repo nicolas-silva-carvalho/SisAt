@@ -1,0 +1,399 @@
+﻿@model AgendamentoViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="wrapper">
+    <!-- Navbar -->
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper" style="margin-left:auto!important;margin-top:50px">
+        <section class="content">
+            <div class="card">
+                <div class="card-body row">
+                    <!-- Coluna de Texto -->
+                    <div class="col-12 col-md-5 text-center d-flex align-items-center justify-content-center">
+                        <div class="" style="padding:20px">
+                            <h2><strong>Agendamento On-line</strong></h2>
+                            <h4 class="text-left">Informações para Agendamento</h4>
+                            <p class="lead mb-5 text-justify">
+                                1. Representante é a pessoa que irá comparecer à unidade de atendimento. Se o próprio contribuinte for comparecer à unidade, deverá preencher o campo do representante com o seu CPF.
+                            </p>
+                            <p class="lead mb-5 text-justify">
+                                2. O representante deverá comparecer no dia marcado com a documentação de identificação. A apresentação de procuração é obrigatória quando o representante for praticar atos ou administrar interesses em nome de outra pessoa que estejam protegidos por sigilo.
+                            </p>
+                            <p class="lead mb-5 text-justify">
+                                3. Nem todos os serviços prestados nas unidades de atendimento são agendáveis.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-7">
+                        <form asp-action="Index" asp-controller="Agendamento" method="post">
+                            <div class="form-group">
+                                <label>Serviços:</label>
+                                @Html.DropDownListFor(
+                                         model => model.id,
+                                         (SelectList)ViewBag.Servicos,
+                                         "Selecione um Serviço",
+                                         new
+                                         {
+                                             @class = "form-control" + (ViewData.ModelState["id"]?.Errors.Count() > 0 ? " is-invalid" : ""),
+                                             id = "id"
+                                         }
+                                         )
+                                @Html.ValidationMessageFor(x => x.id, "Selecionar o serviço é obrigatório.", new { @class = "invalid-feedback" })
+                            </div>
+                            <div class="form-group">
+                                <label>CPF/CNPJ:</label>
+                                <input type="text" asp-for="CpfCnpj" id="cpfCpj" class="form-control @(ViewData.ModelState["CpfCnpj"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Informe o CPF ou CNPJ" />
+                                @Html.ValidationMessageFor(x => x.CpfCnpj, "", new { @class = "invalid-feedback" })
+                            </div>
+                            <div class="form-group">
+                                <label>Nome:</label>
+                                <input type="text" asp-for="Nome" id="nome" class="form-control @(ViewData.ModelState["Nome"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Informe seu nome." />
+                                @Html.ValidationMessageFor(x => x.Nome, "", new { @class = "invalid-feedback" })
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail:</label>
+                                <input type="email" asp-for="Email" id="email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" id="Email" placeholder="Email">
+                                @Html.ValidationMessageFor(x => x.Email, "", new { @class = "invalid-feedback" })
+                            </div>
+                            <div style="padding-left:0">
+                                <div class="card bg-gradient-info">
+                                    <div class="card-header border-0">
+                                        <h3 class="card-title">
+                                            <i class="far fa-calendar-alt"></i>
+                                            Calendario
+                                        </h3>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-info btn-sm" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-info btn-sm" data-card-widget="remove">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body pt-0">
+                                        <div id="calendar" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="padding-left:0">
+                                <div class="card bg-gradient-info" id="horarios-container" style="display: none;">
+                                    <table class="table table-bordered" id="horarios-table" style="margin-bottom:0;">
+                                        <thead>
+                                            <tr>
+                                                <!-- Centraliza o título "Horários" na tabela -->
+                                                <th colspan="5" class="text-center">Horários Disponíveis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Horários vão aqui, com a quebra de linha a cada 5 itens -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <input type="hidden" id="horarioChecked" name="horarioChecked" />
+                            <input type="hidden" id="data" name="data" />
+                            <div class="form-group">
+                                <button type="submit" id="salvar" class="btn btn-primary">Salvar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        var toastrMessage = TempData["Error"] as string;
+        var toastrMessageSuccess = TempData["Sucesso"] as string;
+    }
+
+    @if (!string.IsNullOrEmpty(toastrMessage))
+    {
+        <script>
+            toastr.error('@toastrMessage', 'Erro', {
+                closeButton: true,
+                progressBar: true
+            });
+        </script>
+    }
+
+    @if (!string.IsNullOrEmpty(toastrMessageSuccess))
+    {
+        <script>
+            toastr.success('@toastrMessageSuccess', 'Sucesso.', {
+                closeButton: true,
+                progressBar: true
+            });
+        </script>
+    }
+
+    <script>
+        $(document).ready( function() {
+            $('#salvar').on('click', function() {
+                var horarios = [];
+
+                $('#horarios-table .horario-checkbox:checked').each(function() {
+                    var hora = $(this).data('hora');
+                    var id = $(this).val();
+                    var data = $('#data').val();
+                    horarios.push({
+                        id: id,
+                        hora: hora,
+                        data: data
+                    });
+                });
+
+                $('#horarioChecked').val(JSON.stringify(horarios));
+            });
+
+            $('#id').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#cpfCpj').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#nome').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#email').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('#calendar').datetimepicker({
+                inline: true,
+                locale: 'pt-br',
+                format: 'L',
+                icons: {
+                    time: 'far fa-clock',
+                    date: 'far fa-calendar',
+                    up: 'fa fa-arrow-up',
+                    down: 'fa fa-arrow-down'
+                },
+                tooltips: {
+                    today: 'Hoje',
+                    clear: 'Limpar',
+                    close: 'Fechar',
+                    selectMonth: 'Selecionar Mês',
+                    selectYear: 'Selecionar Ano',
+                    selectTime: 'Selecione a Hora',
+                    incrementHour: 'Incrementar Hora',
+                    decrementHour:'Decrementar Hora',
+                    incrementMinute: 'Incrementar Minuto',
+                    decrementMinute:'Decrementar  Minuto',
+                    selectDate: 'Selecionar a Data'
+                },
+                toolbarplacement: 'bottom',
+                minDate: moment()
+            });
+
+            $('#calendar').on('change.datetimepicker', function (e) {
+                var selectedDate = e.date.format('L');
+                var data = $('#data').val(selectedDate);
+                console.log(data);
+                var id = $("#id").val();
+                if (id && data) {
+                    $.ajax({
+                    url: '@Url.Action("Horarios", "Agendamento", new { id = "__id__" })'.replace('__id__', id) + '?data=' + selectedDate,
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+                            console.log(response);
+                            toastr.success('Horários carregados com sucesso!', 'Sucesso.', { closeButton: true, progressBar: true });
+                            var tableBody = $("#horarios-table tbody");
+                            tableBody.empty();
+                            if (response.horarios && response.horarios.length > 0) {
+                                const formatador = new Intl.DateTimeFormat('pt-BR', {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric"
+                                });
+
+                                let rowHtml = '';
+                                let count = 0;
+                                let tableBody = $('#horarios-table tbody');
+                                tableBody.empty();
+
+                                response.horarios.forEach(function (horario, index) {
+                                    console.log(horario);
+                                    if (count % 5 === 0) {
+                                        if (count > 0) {
+                                            rowHtml += "</tr>";
+                                        }
+                                        rowHtml += "<tr>";
+                                    }
+
+                                    rowHtml += "<td><div class='form-check-inline'>" +
+                                                "<input id='diaChecked" + horario.id + "' type='checkbox' class='horario-checkbox form-check-input' value='" + horario.id + "' data-hora='" + horario.hora + "' />" +
+                                                "<label class='form-check-label'>" + horario.hora + "</label>" +
+                                                "</div></td>";
+
+                                    count++;
+                                    if (index === response.horarios.length - 1) {
+                                        rowHtml += "</tr>";
+                                    }
+                                });
+
+                                tableBody.html(rowHtml);
+
+                                $("#horarios-container").show();
+                            } else {
+                                toastr.warning('Nenhum horário disponível para este serviço.', 'Aviso', { closeButton: true, progressBar: true });
+                                $("#horarios-container").hide();
+                            }
+                        } else {
+                            toastr.error('Nenhum horário disponível para este serviço.', 'Erro.', { closeButton: true, progressBar: true });
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
+                    }
+                    });
+
+                } else {
+                    toastr.info("É necessários selecionar um serviço e uma data para selecionar os horários disponíneis.", "Informação", { closeButton: true, progressBar: true });
+                }
+                if ($('#DataHoraInicial input').hasClass('is-invalid')) {
+                    $('#DataHoraInicial input').removeClass('is-invalid');
+                }
+            });
+
+            $('#horarios-table input[type="checkbox"]').on('change', function() {
+                var checkedHorarios = [];
+
+                $('#horarios-table input[type="checkbox"]:checked').each(function() {
+                    checkedHorarios.push($(this).data('hora'));
+                });
+
+                $('#horariosChecked').val(checkedHorarios.join(','));
+
+            });
+        });
+    </script>
+
+    @* <script>
+        $(document).ready( function() {
+            $("#id").change(function () {
+                var idServicoSelecionado = $(this).val();
+
+                if (idServicoSelecionado) {
+                    $.ajax({
+                        url: '@Url.Action("DatasDisponiveis", "Agendamento", new { id = "__id__" })'.replace('__id__', idServicoSelecionado),
+                        type: 'GET',
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success('Horários carregados com sucesso!', 'Sucesso.', { closeButton: true, progressBar: true });
+                                var tableBody = $("#datas-table tbody");
+                                tableBody.empty();
+                                if (response.horarios && response.horarios.length > 0) {
+
+                                    const formatador = new Intl.DateTimeFormat('pt-BR', {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric"
+                                    });
+
+                                    response.horarios.forEach(function (horario) {
+                                        console.log(horario);
+
+                                        var row = "<tr>" +
+                                                    "<td><div class='form-check-inline'><input id='diaChecked' type='checkbox' class='datas-checkbox form-check-input' value='" + horario.servicoId + "' data-hora='" + horario.hora + "' /><label class='form-check-label'>"+ formatador.format(new Date(horario.dataCadastrada)) + "</label></div></td>"
+                                                  "</tr>";
+                                        tableBody.append(row);
+                                    });
+                                    $("#datas-container").show();
+                                } else {
+                                    toastr.warning('Nenhum horário disponível para este serviço.', 'Aviso', { closeButton: true, progressBar: true });
+                                    $("#datas-container").hide();
+                                }
+                            } else {
+                                toastr.error('Nenhum horário disponível para este serviço.', 'Erro.', { closeButton: true, progressBar: true });
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
+                        }
+                    });
+                } else {
+                    $("#datas-container").hide();
+                }
+            });
+
+
+        });
+    </script>
+
+    <script>
+        $(document).ready( function() {
+            $('body').on('change', '.datas-checkbox', function () {
+                if ($(this).is(':checked')) {
+                    var idServicoSelecionado = $(this).val();
+                    $.ajax({
+                        url: '@Url.Action("Horarios", "Agendamento", new { id = "__id__" })'.replace('__id__', idServicoSelecionado),
+                        type: 'GET',
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success('Horários carregados com sucesso!', 'Sucesso.', { closeButton: true, progressBar: true });
+                                var tableBody = $("#horarios-table tbody");
+                                tableBody.empty();
+                                if (response.horarios && response.horarios.length > 0) {
+
+                                    const formatador = new Intl.DateTimeFormat('pt-BR', {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric"
+                                    });
+
+                                    response.horarios.forEach(function (horario) {
+                                        console.log(horario);
+
+                                        var row = "<tr>" +
+                                                    "<td><div class='form-check-inline'><input id='diaChecked' type='checkbox' class='horario-checkbox form-check-input' value='" + horario.servicoId + "' data-hora='" + horario.hora + "' /><label class='form-check-label'>"+ horario.hora + "</label></div></td>"
+                                                  "</tr>";
+                                        tableBody.append(row);
+                                    });
+                                    $("#horarios-container").show();
+                                } else {
+                                    toastr.warning('Nenhum horário disponível para este serviço.', 'Aviso', { closeButton: true, progressBar: true });
+                                    $("#horarios-container").hide();
+                                }
+                            } else {
+                                toastr.error('Nenhum horário disponível para este serviço.', 'Erro.', { closeButton: true, progressBar: true });
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
+                        }
+                    });
+                    var botaoHorarios = document.createElement('button');
+                    botaoHorarios.classList.add('btn', 'btn-info', 'btn-sm', 'mr-2');
+                    var iconeHorario = document.createElement('i');
+                    iconeHorario.classList.add('fas', 'fa-edit');
+                    botaoHorarios.appendChild(iconeHorario);
+                    console.log("Checkbox marcado: " + $(this).val());  // Exibe o valor do checkbox marcado
+                } else {
+                    console.log("Checkbox desmarcado: " + $(this).val());  // Exibe o valor do checkbox desmarcado
+                }
+            });
+        });
+    </script> *@
+}
