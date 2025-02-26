@@ -11,5 +11,6 @@ namespace SisAt.Repository.Persistence.Interfaces
         Task<List<CadastroDeHorarios>> BuscarHorariosDisponiveisPorServico(DateTime? data, int servicoId);
         Task<CadastroDeHorarios> BuscarCadastroDeHorarioPorIdAsync(int cadastroId);
         Task<CadastroDeHorarios> AtualizarCadastroDeHorarioPorIdAsync(int cadastroId, CadastroDeHorarios cadastroDeHorarios);
+        Task<Senha> ConfirmarAgendamentoAsync(string protocolo);
     }
 }

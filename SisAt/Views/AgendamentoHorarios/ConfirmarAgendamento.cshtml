@@ -1,7 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Ínicio";
+﻿@model ConfirmarAgendamentoViewModel
+@{
+    ViewData["Title"] = "Confirmação de Agendamento";
 }
-
 <div class="wrapper">
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
@@ -74,31 +74,24 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h4>Cadastro de Horários</h4>
-
-                                <p>Acessar</p>
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Digite o procolo para confirmar e imprimir a senha:</h3>
                             </div>
-                            <div class="icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <a asp-action="CadastroDeHorarios" asp-controller="AgendamentoHorarios" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h4>Confirmação de Agendamento</h4>
-
-                                <p>Acessar</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fa fa-check"></i>
-                            </div>
-                            <a asp-action="ConfirmarAgendamento" asp-controller="AgendamentoHorarios" class="small-box-footer">Mais informações <i class="fas fa-arrow-circle-right"></i></a>
+                            <form asp-action="ConfirmarAgendamento" asp-controller="AgendamentoHorarios" method="post">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Confirme a senha:</label>
+                                        <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="Protocolo" asp-for="Protocolo" placeholder="Digite o Protocolo do agendamento" />
+                                        @Html.ValidationMessageFor(x => x.Protocolo, "", new { @class = "invalid-feedback" })
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-outline-success">Salvar</button>
+                                    <a role="button" class="btn btn-default" asp-action="Index" asp-controller="AgendamentoHorarios">Voltar</a>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -114,7 +107,7 @@
 @section Scripts {
     @{
         var toastrMessage = TempData["Error"] as string;
-        var toastrMessageSuccess = TempData["Sucesso"] as string;
+        var toastrMessageSuccess = TempData["ToastrMessageSuccess"] as string;
     }
 
     @if (!string.IsNullOrEmpty(toastrMessage))
@@ -136,4 +129,14 @@
             });
         </script>
     }
+
+    <script>
+        $(document).ready( function() {
+            $('#Protocolo').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
 }

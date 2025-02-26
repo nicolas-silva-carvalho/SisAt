@@ -71,6 +71,18 @@ public class AgendamentoController : Controller
                         ag.CadastroDeHorarioId = item.Id;
                     }
 
+                    var cadastro = await _cadastro.BuscarCadastroDeHorarioPorIdAsync(ag.CadastroDeHorarioId);
+
+                    if (cadastro == null)
+                    {
+                        var servicosApi = await _importacao.ServicosApiResponse();
+                        var servicosMappping = _mapper.Map<List<ServicoViewModel>>(servicosApi.dados);
+                        ViewBag.Servicos = new SelectList(servicosMappping, "id", "nome");
+                        TempData["Error"] = "Horário cadastrado não encontrado.";
+                        return View(agendamento);
+                    }
+                    
+                    ag.CadastroDeHorarios = cadastro;
                     var agendamentoRequest = await _agendamento.CadastrarAgendamentoAsync(ag);
                     TempData["Sucesso"] = "Agendamento cadastrado com sucesso.";
                     return RedirectToAction("Index", "Agendamento");

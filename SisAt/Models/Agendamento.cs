@@ -9,6 +9,7 @@ namespace SisAt.Models
         public string Nome { get; set; }
         public string Email { get; set; }
         public int CadastroDeHorarioId { get; set; }
+        public virtual CadastroDeHorarios CadastroDeHorarios { get; set; }
         public int ServicoId { get; set; }
         public DateTime DataMarcada { get; set; }
         public string Hora { get; set; }

@@ -71,5 +71,23 @@ namespace SisAt.API
 
             return null;
         }
+
+        public async Task<SenhaApi> CriacaoDeSenha(int servicoId, string nome)
+        {
+            string url = "http://sga2.gnplay.com.br/api-v2/senha/criar/?token=6a878fbb0f5bf5747e565fde63a1996202284654";
+            var client = new RestClient();
+            var request = new RestRequest(url, Method.Post);
+            request.AddParameter("id_servico", servicoId);
+            request.AddParameter("cidadao", nome);
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                var senhaApi = JsonConvert.DeserializeObject<SenhaApi>(response.Content);
+                return senhaApi;
+            }
+
+            return null;
+        }
     }
 }

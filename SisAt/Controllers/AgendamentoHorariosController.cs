@@ -39,8 +39,7 @@ public class AgendamentoHorariosController : Controller
         }
         catch (Exception ex)
         {
-
-            throw;
+            throw new Exception(ex.Message);
         }
     }
 
@@ -112,5 +111,42 @@ public class AgendamentoHorariosController : Controller
         {
             return Json(new { success = false, message = ex.Message });
         }
+    }
+
+    public IActionResult ConfirmarAgendamento()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ConfirmarAgendamento(ConfirmarAgendamentoViewModel confirmarAgendamentoViewModel)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                var senha = await _cadastro.ConfirmarAgendamentoAsync(confirmarAgendamentoViewModel.Protocolo);
+
+                if (senha == null)
+                {
+                    TempData["Error"] = "Houve um erro ao confirmar a senha.";
+                    return View(confirmarAgendamentoViewModel);
+                }
+
+                var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
+                return RedirectToAction("Senha", senhaMap);
+            }
+
+            return View(confirmarAgendamentoViewModel);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public IActionResult Senha(SenhaViewlModel senha)
+    {
+        return View(senha);
     }
 }
