@@ -20,3 +20,15 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+#horarios-table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+#horarios-container {
+    max-width: 100%;
+    overflow-x: auto;
+}

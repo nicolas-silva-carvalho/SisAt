@@ -56,7 +56,8 @@
                                 <input type="email" asp-for="Email" id="email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" id="Email" placeholder="Email">
                                 @Html.ValidationMessageFor(x => x.Email, "", new { @class = "invalid-feedback" })
                             </div>
-                            <div style="padding-left:0">
+                            <div id="divCalendario" style="padding-left:0; display:none">
+                                <label>Data Disponíveis:</label>
                                 <div class="card bg-gradient-info">
                                     <div class="card-header border-0">
                                         <h3 class="card-title">
@@ -179,39 +180,68 @@
 
     <script type="text/javascript">
         $(function () {
-            $('#calendar').datetimepicker({
-                inline: true,
-                locale: 'pt-br',
-                format: 'L',
-                icons: {
-                    time: 'far fa-clock',
-                    date: 'far fa-calendar',
-                    up: 'fa fa-arrow-up',
-                    down: 'fa fa-arrow-down'
-                },
-                tooltips: {
-                    today: 'Hoje',
-                    clear: 'Limpar',
-                    close: 'Fechar',
-                    selectMonth: 'Selecionar Mês',
-                    selectYear: 'Selecionar Ano',
-                    selectTime: 'Selecione a Hora',
-                    incrementHour: 'Incrementar Hora',
-                    decrementHour:'Decrementar Hora',
-                    incrementMinute: 'Incrementar Minuto',
-                    decrementMinute:'Decrementar  Minuto',
-                    selectDate: 'Selecionar a Data'
-                },
-                toolbarplacement: 'bottom',
-                minDate: moment()
+            $('#id').on('change', function () {
+                var id = $("#id").val();
+                $.ajax({
+                    url: '@Url.Action("DiasDisponiveis", "Agendamento", new { id = "__id__" })'.replace('__id__', id), // Ajuste para o seu endpoint
+                    type: 'GET',
+                    success: function(response) {
+                        console.log(response);
+
+                        if (response.success && response.dias && Array.isArray(response.dias)) {
+                            var datasDisponiveis = response.dias.map(function(item) {
+                                return moment(item.dataCadastrada).format('YYYY-MM-DD');
+                            });
+
+                            var datasMoment = datasDisponiveis.map(function(date) {
+                                return moment(date, 'YYYY-MM-DD');
+                            });
+
+                            $("#divCalendario").show();
+
+                            $('#calendar').datetimepicker('destroy');
+
+                            $('#calendar').datetimepicker({
+                                inline: true,
+                                locale: 'pt-br',
+                                format: 'L',
+                                icons: {
+                                    time: 'far fa-clock',
+                                    date: 'far fa-calendar',
+                                    up: 'fa fa-arrow-up',
+                                    down: 'fa fa-arrow-down'
+                                },
+                                tooltips: {
+                                    today: 'Hoje',
+                                    clear: 'Limpar',
+                                    close: 'Fechar',
+                                    selectMonth: 'Selecionar Mês',
+                                    selectYear: 'Selecionar Ano',
+                                    selectTime: 'Selecione a Hora',
+                                    incrementHour: 'Incrementar Hora',
+                                    decrementHour: 'Decrementar Hora',
+                                    incrementMinute: 'Incrementar Minuto',
+                                    decrementMinute: 'Decrementar  Minuto',
+                                    selectDate: 'Selecionar a Data'
+                                },
+                                toolbarplacement: 'bottom',
+                                minDate: moment(),
+                                enabledDates: datasMoment
+                            });
+                        } else {
+                            console.error('Formato de resposta inesperado ou a chave "dias" não existe');
+                        }
+                    },
+                    error: function() {
+                        console.error('Erro ao carregar datas disponíveis');
+                    }
+                });
             });
 
             $('#calendar').on('change.datetimepicker', function (e) {
                 var selectedDate = e.date.format('L');
-                var data = $('#data').val(selectedDate);
-                console.log(data);
                 var id = $("#id").val();
-                if (id && data) {
+                if (id && selectedDate) {
                     $.ajax({
                     url: '@Url.Action("Horarios", "Agendamento", new { id = "__id__" })'.replace('__id__', id) + '?data=' + selectedDate,
                     type: 'GET',
@@ -268,7 +298,6 @@
                         toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
                     }
                     });
-
                 } else {
                     toastr.info("É necessários selecionar um serviço e uma data para selecionar os horários disponíneis.", "Informação", { closeButton: true, progressBar: true });
                 }
@@ -277,16 +306,16 @@
                 }
             });
 
-            $('#horarios-table input[type="checkbox"]').on('change', function() {
-                var checkedHorarios = [];
+            // $('#horarios-table input[type="checkbox"]').on('change', function() {
+            //     var checkedHorarios = [];
 
-                $('#horarios-table input[type="checkbox"]:checked').each(function() {
-                    checkedHorarios.push($(this).data('hora'));
-                });
+            //     $('#horarios-table input[type="checkbox"]:checked').each(function() {
+            //         checkedHorarios.push($(this).data('hora'));
+            //     });
 
-                $('#horariosChecked').val(checkedHorarios.join(','));
+            //     $('#horariosChecked').val(checkedHorarios.join(','));
 
-            });
+            // });
         });
     </script>
 

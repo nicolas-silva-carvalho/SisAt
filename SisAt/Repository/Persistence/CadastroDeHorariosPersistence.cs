@@ -114,11 +114,17 @@ namespace SisAt.Repository.Persistence
             }
         }
 
-        public async Task<List<CadastroDeHorarios>> BuscarHorariosDisponiveisPorServico(DateTime data, int servicoId)
+        public async Task<List<CadastroDeHorarios>> BuscarHorariosDisponiveisPorServico(DateTime? data, int servicoId)
         {
             try
             {
-                var cadastros = _context.CadastroDeHorarios.Where(x => x.ServicoId == servicoId && x.Marcado == false && x.DataCadastrada.Day == data.Day).OrderBy(x => x.Id);
+                if (data == null)
+                {
+                    var dias = _context.CadastroDeHorarios.Where(x => x.ServicoId == servicoId && x.Marcado == false).OrderBy(x => x.Id);
+                    return await dias.ToListAsync();
+                }
+
+                var cadastros = _context.CadastroDeHorarios.Where(x => x.ServicoId == servicoId && x.Marcado == false && x.DataCadastrada.Day == data.Value.Day).OrderBy(x => x.Id);
 
                 if (cadastros == null) return null;
 

@@ -106,6 +106,25 @@ public class AgendamentoController : Controller
         }
     }
 
+    public async Task<IActionResult> DiasDisponiveisAsync(int id)
+    {
+        try
+        {
+            var dias = await _cadastro.BuscarHorariosDisponiveisPorServico(null, id);
+
+            if (dias == null || dias.Count == 0)
+            {
+                return Json(new { success = false, message = "Nenhum horário encontrado para este serviço." });
+            }
+
+            return Json(new { success = true, dias = dias });
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
     public async Task<IActionResult> HorariosAsync(string data, int id)
     {
         try
