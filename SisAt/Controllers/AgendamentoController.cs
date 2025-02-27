@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using SisAt.API;
 using SisAt.Models;
 using SisAt.Repository.Persistence.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace SisAt.Controllers;
 public class AgendamentoController : Controller
@@ -25,6 +26,7 @@ public class AgendamentoController : Controller
     {
         try
         {
+            ViewBag.MenuAtivo = "Inicio";
             var servicos = await _importacao.ServicosApiResponse();
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
             ViewBag.Servicos = new SelectList(servicosMap, "id", "nome");
@@ -42,10 +44,13 @@ public class AgendamentoController : Controller
     {
         try
         {
+            ViewBag.MenuAtivo = "Inicio";
             if (ModelState.IsValid && horarioChecked != "[]")
             {
                 if (horarioChecked != null)
                 {
+                    var cpf = Regex.Replace(agendamento.CpfCnpj, @"[^\d]", "");
+                    agendamento.CpfCnpj = cpf;
                     var horario = JsonConvert.DeserializeObject<List<HorarioViewModel>>(horarioChecked);
                     if (horario.Count > 1)
                     {

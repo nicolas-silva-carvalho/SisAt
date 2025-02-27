@@ -32,3 +32,14 @@ body {
     max-width: 100%;
     overflow-x: auto;
 }
+
+@media (max-width: 767px) {
+    .col-sm-6 {
+        flex: 1 1 100%;
+        margin-bottom: 20px;
+    }
+
+    #divCalendario, #horariosContainer {
+        width: 100%;
+    }
+}
