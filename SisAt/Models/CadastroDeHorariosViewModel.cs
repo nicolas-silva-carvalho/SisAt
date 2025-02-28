@@ -3,6 +3,5 @@
     public class CadastroDeHorariosViewModel
     {
         public int id { get; set; }
-        public string DataCadastrada { get; set; }
     }
 }

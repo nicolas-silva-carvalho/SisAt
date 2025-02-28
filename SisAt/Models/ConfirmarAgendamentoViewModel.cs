@@ -4,7 +4,9 @@ namespace SisAt.Models
 {
     public class ConfirmarAgendamentoViewModel
     {
-        [Required(ErrorMessage = "É obrigatório confirmar a senha.")]
-        public string Protocolo { get; set; }
+        public string? Protocolo { get; set; }
+        public string? CPF { get; set; }
+        public List<AgendamentoPesquisa> Agendamentos { get; set; }
+        public bool PesquisaRealizada { get; set; }
     }
 }

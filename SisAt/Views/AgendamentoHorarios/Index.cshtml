@@ -33,15 +33,15 @@
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <li class="nav-item @(ViewBag.MenuAtivo == "Inicio" ? "menu-open" : "")">
-                        <a class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
+                        <a asp-controller="AgendamentoHorarios" asp-action="Index" class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
                             <i class="nav-icon fas fa-home"></i>
                             <p>
                                 Início
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item @(ViewBag.MenuAtivo == "Plantao" ? "menu-open" : "")">
-                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Plantao" ? "active" : "")">
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Horario" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Horario" ? "active" : "")">
                             <i class="nav-icon fas fa-pencil-alt"></i>
                             <p>
                                 Horários
@@ -49,13 +49,21 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item @(ViewBag.ActivePage == "" ? "active"  : "")">
-                                <a class="nav-link @(ViewBag.ActivePage == "" ? "active" : "")">
+                            <li class="nav-item @(ViewBag.ActivePage == "CadastroHorario" ? "active"  : "")">
+                                <a asp-action="CadastroDeHorarios" asp-controller="AgendamentoHorarios" class="nav-link @(ViewBag.ActivePage == "CadastroHorario" ? "active" : "")">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Controle de Plantões</p>
+                                    <p>Cadastro de Horários</p>
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Confirmar" ? "menu-open" : "")">
+                        <a asp-controller="AgendamentoHorarios" asp-action="ConfirmarAgendamento" class="nav-link @(ViewBag.MenuAtivo == "Confirmar" ? "active" : "")">
+                            <i class="nav-icon fa fa-check"></i>
+                            <p>
+                                Confirmar Agendamento
+                            </p>
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -89,7 +97,7 @@
                     </div>
 
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
+                        <div class="small-box bg-success">
                             <div class="inner">
                                 <h4>Confirmação de Agendamento</h4>
 

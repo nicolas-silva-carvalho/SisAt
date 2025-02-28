@@ -2,7 +2,137 @@
 @{
     ViewData["Title"] = "Cadastro de Horários";
 }
+<style>
+    .cardInside {
+        box-shadow: 0px 4px 8px 0px #7986CB
+    }
 
+    input:focus {
+        -moz-box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        border: 1px solid #512DA8;
+        outline-width: 0
+    }
+
+    ::placeholder {
+        color: #fff;
+        opacity: 1
+    }
+
+    :-ms-input-placeholder {
+        color: #fff
+    }
+
+    ::-ms-input-placeholder {
+        color: #fff
+    }
+
+    button:focus {
+        -moz-box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        outline-width: 0
+    }
+
+    .datepicker-dropdown:after {
+        border-bottom: 6px solid #000
+    }
+
+    thead tr:nth-child(3) th {
+        color: #fff !important;
+        font-weight: bold;
+        padding-top: 20px;
+        padding-bottom: 10px
+    }
+
+    .dow,
+    .old-day,
+    .day,
+    .new-day {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 0px !important
+    }
+
+        .old-day:hover,
+        .day:hover,
+        .new-day:hover,
+        .month:hover,
+        .year:hover,
+        .decade:hover,
+        .century:hover {
+            border-radius: 6px !important;
+            background-color: #eee;
+            color: #000
+        }
+
+    .botao {
+        padding: 12px 24px;
+        border-radius: 2px;
+        -moz-border-radius: 2px;
+        -webkit-border-radius: 2px;
+        background: #14bdad;
+        border: 1px solid #14bdad;
+    }
+
+    tr > td.active {
+        border-radius: 6px !important;
+        background-image: linear-gradient(135deg, #434343 10%, #000000 100%) !important;
+        color: ##fafafa !important
+    }
+
+    .disabled {
+        color: #616161 !important
+    }
+
+    .prev,
+    .next,
+    .datepicker-switch {
+        border-radius: 0 !important;
+        padding: 20px 10px !important;
+        text-transform: uppercase;
+        font-size: 20px;
+        opacity: 0.8
+    }
+
+        .prev:hover,
+        .next:hover,
+        .datepicker-switch:hover {
+            background-color: inherit !important;
+            opacity: 1
+        }
+
+    .cell {
+        border: 1px solid #BDBDBD;
+        margin: 2px;
+        cursor: pointer
+    }
+
+        .cell:hover {
+            border: 1px solid #343a40 !important
+        }
+
+        .cell.select {
+            background-color: #343a40 !important;
+            color: #fff
+        }
+
+    .d-flex {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .col-sm-6 {
+        flex: 1 1 50%;
+        padding: 10px;
+    }
+
+    #divCalendario, #horariosContainer {
+        display: block;
+        width: 100%;
+    }
+</style>
 <div class="wrapper">
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
@@ -34,15 +164,15 @@
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <li class="nav-item @(ViewBag.MenuAtivo == "Inicio" ? "menu-open" : "")">
-                        <a class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
+                        <a asp-controller="AgendamentoHorarios" asp-action="Index" class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
                             <i class="nav-icon fas fa-home"></i>
                             <p>
                                 Início
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item @(ViewBag.MenuAtivo == "Plantao" ? "menu-open" : "")">
-                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Plantao" ? "active" : "")">
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Horario" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Horario" ? "active" : "")">
                             <i class="nav-icon fas fa-pencil-alt"></i>
                             <p>
                                 Horários
@@ -50,13 +180,21 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item @(ViewBag.ActivePage == "" ? "active"  : "")">
-                                <a class="nav-link @(ViewBag.ActivePage == "" ? "active" : "")">
+                            <li class="nav-item @(ViewBag.ActivePage == "CadastroHorario" ? "active"  : "")">
+                                <a asp-action="CadastroDeHorarios" asp-controller="AgendamentoHorarios" class="nav-link @(ViewBag.ActivePage == "CadastroHorario" ? "active" : "")">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Controle de Plantões</p>
+                                    <p>Cadastro de Horários</p>
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Confirmar" ? "menu-open" : "")">
+                        <a asp-controller="AgendamentoHorarios" asp-action="ConfirmarAgendamento" class="nav-link @(ViewBag.MenuAtivo == "Confirmar" ? "active" : "")">
+                            <i class="nav-icon fa fa-check"></i>
+                            <p>
+                                Confirmar Agendamento
+                            </p>
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -83,7 +221,6 @@
                             <form asp-action="CadastroDeHorarios" asp-controller="AgendamentoHorarios">
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <div class="col-sm-4" style="padding-left:0">
                                             <div class="form-group">
                                                 <label>Serviços:</label>
                                                 @Html.DropDownListFor(
@@ -98,59 +235,58 @@
                                                          )
                                                 @Html.ValidationMessageFor(x => x.id, "Selecionar o serviço é obrigatório.", new { @class = "invalid-feedback" })
                                             </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <div class="col-sm-4" style="padding-left:0">
+                                        @* <div class="d-flex">
+                                            <div class="col-sm-2" style="padding-left:0">
                                                 <div class="form-group">
                                                     <label>Data:</label>
                                                     <div class="input-group date" id="DataHoraInicial" data-target-input="nearest">
-                                                        <input type="text" asp-for="DataCadastrada" class="form-control datetimepicker-input @(ViewData.ModelState["DataCadastrada"]?.Errors.Count() > 0 ? "is-invalid" : "")" data-target="#DataHoraInicial" placeholder="Data do serviço." />
-                                                        <div class="input-group-append" data-target="#DataHoraInicial" data-toggle="datetimepicker">
+                                                        <input disabled type="text" asp-for="DataCadastrada" class="form-control datetimepicker-input @(ViewData.ModelState["DataCadastrada"]?.Errors.Count() > 0 ? "is-invalid" : "")" data-target="#DataHoraInicial" placeholder="Data do serviço." />
+                                                        <div class="input-group-append" data-target="#DataHoraInicial">
                                                             <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                                         </div>
                                                         @Html.ValidationMessageFor(x => x.DataCadastrada, "É obrigatório escolher a data para cadastro de horário.", new { @class = "invalid-feedback" })
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-4" style="padding-left:0">
-                                            <div class="card bg-gradient-info">
-                                                <div class="card-header border-0">
-                                                    <h3 class="card-title">
-                                                        <i class="far fa-calendar-alt"></i>
-                                                        Datas
-                                                    </h3>
-                                                    <div class="card-tools">
-                                                        <button type="button" class="btn btn-info btn-sm" data-card-widget="collapse">
-                                                            <i class="fas fa-minus"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-info btn-sm" data-card-widget="remove">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                        </div> *@
+                                        <div class="d-flex flex-column flex-sm-row">
+                                            <div class="col-sm-6" id="divCalendario" style="padding-left:0;display:none">
+                                                <label>Data Disponíveis:</label>
+                                                <div class="card cardInside">
+                                                    <div class="card-header border-0 bg-dark">
+                                                        <h3 class="card-title">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                            Calendario
+                                                        </h3>
+                                                        <div class="card-tools">
+                                                            <button type="button" class="btn btn-dark btn-sm" data-card-widget="collapse">
+                                                                <i class="fas fa-minus"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-dark btn-sm" data-card-widget="remove">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body pt-0">
+                                                        <div id="calendar" style="width: 100%"></div>
                                                     </div>
                                                 </div>
-                                                <div class="card-body pt-0">
-                                                    <div id="calendar" style="width: 100%"></div>
+                                            </div>
+                                            <div class="col-sm-6" style="padding-left:0; padding-right:0">
+                                                <div class="form-group" id="horariosContainer" style="display: none;">
+                                                    <label>Horários Disponíveis:</label>
+                                                    <div class="cardInside border-0" style="height:417px;">
+                                                        <div class="card-header bg-dark text-center" id="dia">
+                                                        </div>
+                                                        <div class="card-body p-3 p-sm-5">
+                                                            <div id="horarios-container"></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4" style="padding-left:0;">
-                                            <div class="card bg-gradient-info" id="horarios-container" style="display: none;">
-                                                <table class="table table-bordered" id="horarios-table" style="width: 100%; max-width: 100%; margin-bottom: 0; table-layout: fixed; overflow: hidden;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th colspan="5" class="text-center">Horários</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <!-- Horários vão aqui -->
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-
-
                                         <input type="hidden" id="horariosChecked" name="horariosChecked" />
+                                        <input type="hidden" id="data" name="data" />
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -198,120 +334,114 @@
 
     <script type="text/javascript">
         $(function () {
-            $('#calendar').datetimepicker({
-                inline: true,
-                locale: 'pt-br',
-                format: 'L',
-                icons: {
-                    time: 'far fa-clock',
-                    date: 'far fa-calendar',
-                    up: 'fa fa-arrow-up',
-                    down: 'fa fa-arrow-down'
-                },
-                tooltips: {
-                    today: 'Hoje',
-                    clear: 'Limpar',
-                    close: 'Fechar',
-                    selectMonth: 'Selecionar Mês',
-                    selectYear: 'Selecionar Ano',
-                    selectTime: 'Selecione a Hora',
-                    incrementHour: 'Incrementar Hora',
-                    decrementHour:'Decrementar Hora',
-                    incrementMinute: 'Incrementar Minuto',
-                    decrementMinute:'Decrementar  Minuto',
-                    selectDate: 'Selecionar a Data'
-                },
-                toolbarplacement: 'bottom',
-                minDate: moment()
+            $('#id').on('change', function () {
+                $("#divCalendario").show();
+                $('#calendar').datetimepicker('destroy');
+                $('#calendar').datetimepicker({
+                    inline: true,
+                    locale: 'pt-br',
+                    format: 'L',
+                    icons: {
+                        time: 'far fa-clock',
+                        date: 'far fa-calendar',
+                        up: 'fa fa-arrow-up',
+                        down: 'fa fa-arrow-down'
+                    },
+                    tooltips: {
+                        today: 'Hoje',
+                        clear: 'Limpar',
+                        close: 'Fechar',
+                        selectMonth: 'Selecionar Mês',
+                        selectYear: 'Selecionar Ano',
+                        selectTime: 'Selecione a Hora',
+                        incrementHour: 'Incrementar Hora',
+                        decrementHour:'Decrementar Hora',
+                        incrementMinute: 'Incrementar Minuto',
+                        decrementMinute:'Decrementar  Minuto',
+                        selectDate: 'Selecionar a Data'
+                    },
+                    toolbarplacement: 'bottom',
+                    minDate: moment()
+                });
             });
 
             $('#calendar').on('change.datetimepicker', function (e) {
                 var selectedDate = e.date.format('L');
-                var data = $('#DataHoraInicial input').val(selectedDate);
                 var id = $("#id").val();
-                if (id && data) {
+                $("#data").val(selectedDate);
+                if (id) {
                     $.ajax({
                     url: '@Url.Action("Horarios", "AgendamentoHorarios", new { id = "__id__" })'.replace('__id__', id) + '?data=' + selectedDate,
                     type: 'GET',
                     success: function (response) {
                         if (response.success) {
-                            console.log(response);
-                            toastr.success('Horários carregados com sucesso!', 'Sucesso.', { closeButton: true, progressBar: true });
-                            var tableBody = $("#horarios-table tbody");
-                            tableBody.empty();
-                            if (response.horarios && response.horarios.length > 0) {
-                                const formatador = new Intl.DateTimeFormat('pt-BR', {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric"
-                                });
+                            // toastr.success('Horários carregados com sucesso!', 'Sucesso.', { closeButton: true, progressBar: true });
+                            $("#dia").text('Data: ' + selectedDate);
+                            var container = $("#horarios-container");
+                            container.empty();
 
-                                let rowHtml = '';
+                            if (response.horarios && response.horarios.length > 0) {
                                 let count = 0;
-                                let tableBody = $('#horarios-table tbody');
-                                tableBody.empty();
+                                let rowHtml = '';
+
+                                rowHtml += "<div class='row text-center mx-0'>";
 
                                 response.horarios.forEach(function (horario, index) {
-                                    if (count % 5 === 0) {
-                                        if (count > 0) {
-                                            rowHtml += "</tr>";
-                                        }
-                                        rowHtml += "<tr>";
-                                    }
 
                                     if (horario.disponivel == true) {
-
-                                    
-                                        rowHtml += "<td><div class='form-check-inline'>" +
-                                                    "<input id='diaChecked" + horario.id + "' type='checkbox' class='horario-checkbox form-check-input' value='" + horario.id + "' data-hora='" + horario.hora + "' />" +
-                                                    "<label class='form-check-label'>" + horario.hora + "</label>" +
-                                                    "</div></td>";
-                                    } else{
-                                        rowHtml += "<td><div class='form-check-inline'>" +
-                                                    "<input id='diaChecked" + horario.id + "' type='checkbox' checked disabled class='horario-checkbox form-check-input' value='" + horario.id + "' data-hora='" + horario.hora + "' />" +
-                                                    "<label class='form-check-label'>" + horario.hora + "</label>" +
-                                                    "</div></td>";
+                                        rowHtml += "<div class='col-md-2 col-4 my-1 px-2'>" +
+                                                   "<div class='cell py-1' value ='" + horario.id +"' data-hora='" + horario.hora + "' data-id='" + horario.id + "'>" + horario.hora + "</div></div>";
+                                    } else {
+                                        rowHtml += "<div class='col-md-2 col-4 my-1 px-2'>" +
+                                                   "<div class='cell py-1 select disabled' style='cursor: auto;' disabled readonly value ='" + horario.id +"' data-hora='" + horario.hora + "' data-id='" + horario.id + "'>" + horario.hora + "</div></div>";
                                     }
 
                                     count++;
-                                    if (index === response.horarios.length - 1) {
-                                        rowHtml += "</tr>";
+                                    if (count % 6 === 0) {
+                                        rowHtml += "</div><div class='row text-center mx-0'>";
                                     }
                                 });
 
-                                tableBody.html(rowHtml);
+                                rowHtml += "</div>";
+                                container.html(rowHtml);
 
-                                $("#horarios-container").show();
+                                $("#horariosContainer").show();
                             } else {
+                                $("#horariosContainer").hide();
+                                console.log("aq");
                                 toastr.warning('Nenhum horário disponível para este serviço.', 'Aviso', { closeButton: true, progressBar: true });
-                                $("#horarios-container").hide();
                             }
                         } else {
+                            $("#horariosContainer").hide();
                             toastr.error('Nenhum horário disponível para este serviço.', 'Erro.', { closeButton: true, progressBar: true });
                         }
                     },
                     error: function () {
                         toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
+                        console.log("estou aqui");
                     }
                     });
-
-                } else {
-                    toastr.info("É necessários selecionar um serviço e uma data para selecionar os horários disponíneis.", "Informação", { closeButton: true, progressBar: true });
-                }
-                if ($('#DataHoraInicial input').hasClass('is-invalid')) {
-                    $('#DataHoraInicial input').removeClass('is-invalid');
                 }
             });
 
-            $('#horarios-table input[type="checkbox"]').on('change', function() {
+            $('#horariosContainer').on('click', '.cell', function() {
                 var checkedHorarios = [];
 
-                $('#horarios-table input[type="checkbox"]:checked').each(function() {
+                if ($(this).hasClass('select') && $(this).hasClass('disabled')) {
+                    return;
+                }
+
+                if ($(this).hasClass('select')) {
+                    $(this).removeClass('select');
+                } else {
+                    $(this).addClass('select');
+                }
+
+                $('#horariosContainer .cell.select').each(function() {
                     checkedHorarios.push($(this).data('hora'));
                 });
 
                 $('#horariosChecked').val(checkedHorarios.join(','));
-
             });
         });
     </script>
@@ -321,12 +451,14 @@
             $('#salvar').on('click', function() {
                 var horarios = [];
 
-                $('#horarios-table .horario-checkbox:checked').each(function() {
+                $('#horariosContainer .cell.select').not('.disabled').each(function() {
                     var hora = $(this).data('hora');
-                    var id = $(this).val();
+                    var id = $(this).data('id');
+                    var data = $("#data").val();
                     horarios.push({
                         id: id,
-                        hora: hora
+                        hora: hora,
+                        data: data
                     });
                 });
 
@@ -334,18 +466,6 @@
             });
 
             $('#id').on('change', function () {
-                if ($(this).hasClass('is-invalid')) {
-                    $(this).removeClass('is-invalid');
-                }
-            });
-
-            $('#DataHoraInicial').on('change', function () {
-                if ($(this).hasClass('is-invalid')) {
-                    $(this).removeClass('is-invalid');
-                }
-            });
-
-            $('#HoraInicial').on('change', function () {
                 if ($(this).hasClass('is-invalid')) {
                     $(this).removeClass('is-invalid');
                 }

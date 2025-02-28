@@ -14,11 +14,13 @@ public class AgendamentoHorariosController : Controller
     public readonly IMapper _mapper;
     public readonly IImportacaoAPIService _importacao;
     public readonly ICadastroDeHorariosPersistence _cadastro;
-    public AgendamentoHorariosController(IMapper mapper, IImportacaoAPIService importacao, ICadastroDeHorariosPersistence cadastro)
+    public readonly IAgendamentoPersistence _agendamento;
+    public AgendamentoHorariosController(IMapper mapper, IImportacaoAPIService importacao, ICadastroDeHorariosPersistence cadastro, IAgendamentoPersistence agendamento)
     {
         _mapper = mapper;
         _importacao = importacao;
         _cadastro = cadastro;
+        _agendamento = agendamento;
     }
 
     public IActionResult Index()
@@ -31,6 +33,8 @@ public class AgendamentoHorariosController : Controller
     {
         try
         {
+            ViewBag.MenuAtivo = "Horario";
+            ViewBag.ActivePage = "CadastroHorario";
             var servicos = await _importacao.ServicosApiResponse();
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
             ViewBag.Servicos = new SelectList(servicosMap, "id", "nome");
@@ -48,18 +52,21 @@ public class AgendamentoHorariosController : Controller
     {
         try
         {
+            ViewBag.MenuAtivo = "Horario";
+            ViewBag.ActivePage = "CadastroHorario";
+
             if (ModelState.IsValid && horariosChecked != "[]" )
             {
                 if (horariosChecked != null)
                 {
-                    var horarios = JsonConvert.DeserializeObject<List<Horarios>>(horariosChecked);
+                    var horarios = JsonConvert.DeserializeObject<List<HorarioViewModel>>(horariosChecked);
 
                     foreach (var hora in horarios)
                     {
                         CadastroDeHorarios cadastroDeHorarios = new CadastroDeHorarios()
                         {
                             ServicoId = cadastros.id,
-                            DataCadastrada = Convert.ToDateTime(cadastros.DataCadastrada),
+                            DataCadastrada = Convert.ToDateTime(hora.Data),
                             Hora = hora.Hora,
                             HoraId = hora.Id
                         };
@@ -72,7 +79,7 @@ public class AgendamentoHorariosController : Controller
                 return RedirectToAction("Index", "AgendamentoHorarios");
             }
 
-            if(ModelState.IsValid && horariosChecked == "[]")
+            if (ModelState.IsValid && horariosChecked == "[]")
             {
                 TempData["Error"] = "Selecione pelo menos um horário para o serviço";
                 var servicosRetorno = await _importacao.ServicosApiResponse();
@@ -115,6 +122,7 @@ public class AgendamentoHorariosController : Controller
 
     public IActionResult ConfirmarAgendamento()
     {
+        ViewBag.MenuAtivo = "Confirmar";
         return View();
     }
 
@@ -123,19 +131,32 @@ public class AgendamentoHorariosController : Controller
     {
         try
         {
-            if (ModelState.IsValid)
+            ViewBag.MenuAtivo = "Confirmar";
+
+            if (confirmarAgendamentoViewModel.CPF != null || confirmarAgendamentoViewModel.Protocolo != null)
             {
-                var senha = await _cadastro.ConfirmarAgendamentoAsync(confirmarAgendamentoViewModel.Protocolo);
+                var agendamento = await _agendamento.PegarAgendamentosPorProtocoloECPF(confirmarAgendamentoViewModel.Protocolo, confirmarAgendamentoViewModel.CPF);
+                var agendamentoMap = _mapper.Map<List<AgendamentoPesquisa>>(agendamento);
+                confirmarAgendamentoViewModel.PesquisaRealizada = true;
+                confirmarAgendamentoViewModel.Agendamentos = agendamentoMap;
 
-                if (senha == null)
-                {
-                    TempData["Error"] = "Houve um erro ao confirmar a senha.";
-                    return View(confirmarAgendamentoViewModel);
-                }
-
-                var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
-                return RedirectToAction("Senha", senhaMap);
+                return View(confirmarAgendamentoViewModel);
             }
+
+
+            //if (ModelState.IsValid)
+            //{
+            //    var senha = await _cadastro.ConfirmarAgendamentoAsync(confirmarAgendamentoViewModel.Protocolo);
+
+            //    if (senha == null)
+            //    {
+            //        TempData["Error"] = "Houve um erro ao confirmar a senha.";
+            //        return View(confirmarAgendamentoViewModel);
+            //    }
+
+            //    var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
+            //    return RedirectToAction("Senha", senhaMap);
+            //}
 
             return View(confirmarAgendamentoViewModel);
         }

@@ -17,6 +17,7 @@ namespace SisAt.Helper
             CreateMap<CadastroDeHorariosViewModel, CadastroDeHorarios>().ReverseMap();
             CreateMap<SenhaDadosApi, SisAt.Models.Senha>().ReverseMap();
             CreateMap<SenhaViewlModel, SisAt.Models.Senha>().ReverseMap();
+            CreateMap<AgendamentoPesquisa, Agendamento>().ReverseMap();
         }
     }
 }

@@ -33,15 +33,15 @@
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                     <li class="nav-item @(ViewBag.MenuAtivo == "Inicio" ? "menu-open" : "")">
-                        <a class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
+                        <a asp-controller="AgendamentoHorarios" asp-action="Index" class="nav-link @(ViewBag.MenuAtivo == "Inicio" ? "active" : "")">
                             <i class="nav-icon fas fa-home"></i>
                             <p>
                                 Início
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item @(ViewBag.MenuAtivo == "Plantao" ? "menu-open" : "")">
-                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Plantao" ? "active" : "")">
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Horario" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewBag.MenuAtivo == "Horario" ? "active" : "")">
                             <i class="nav-icon fas fa-pencil-alt"></i>
                             <p>
                                 Horários
@@ -49,13 +49,21 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item @(ViewBag.ActivePage == "" ? "active"  : "")">
-                                <a class="nav-link @(ViewBag.ActivePage == "" ? "active" : "")">
+                            <li class="nav-item @(ViewBag.ActivePage == "CadastroHorario" ? "active"  : "")">
+                                <a asp-action="CadastroDeHorarios" asp-controller="AgendamentoHorarios" class="nav-link @(ViewBag.ActivePage == "CadastroHorario" ? "active" : "")">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Controle de Plantões</p>
+                                    <p>Cadastro de Horários</p>
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="nav-item @(ViewBag.MenuAtivo == "Confirmar" ? "menu-open" : "")">
+                        <a asp-controller="AgendamentoHorarios" asp-action="ConfirmarAgendamento" class="nav-link @(ViewBag.MenuAtivo == "Confirmar" ? "active" : "")">
+                            <i class="nav-icon fa fa-check"></i>
+                            <p>
+                                Confirmar Agendamento
+                            </p>
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -77,19 +85,25 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Digite o procolo para confirmar e imprimir a senha:</h3>
+                                <h3 class="card-title"><i class="fas fa-filter"></i> Filtro de pesquisa</h3>
                             </div>
                             <form asp-action="ConfirmarAgendamento" asp-controller="AgendamentoHorarios" method="post">
                                 <div class="card-body">
+                                    <p>Para confirmar um agendamento pesquise pelo número de protocolo ou CPF.</p>
                                     <div class="form-group">
-                                        <label>Confirme a senha:</label>
-                                        <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="Protocolo" asp-for="Protocolo" placeholder="Digite o Protocolo do agendamento" />
+                                        <label>Protocolo:</label>
+                                        <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="Protocolo" asp-for="Protocolo" placeholder="Digite o Protocolo do agendamento." />
+                                        @Html.ValidationMessageFor(x => x.Protocolo, "", new { @class = "invalid-feedback" })
+                                    </div>
+                                    <div class="form-group">
+                                        <label>CPF:</label>
+                                        <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="Protocolo" asp-for="CPF" placeholder="Digite o CPF." />
                                         @Html.ValidationMessageFor(x => x.Protocolo, "", new { @class = "invalid-feedback" })
                                     </div>
                                 </div>
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-outline-success">Salvar</button>
-                                    <a role="button" class="btn btn-default" asp-action="Index" asp-controller="AgendamentoHorarios">Voltar</a>
+                                <div class="card-footer d-flex justify-content-end">
+                                    <a class="btn btn-default" role="button"><i class="fa fa-times"></i> Limpar</a>
+                                    <button type="submit" class="btn btn-primary mx-2" role="button"><i class="fas fa-search"></i> Buscar</button>
                                 </div>
                             </form>
                         </div>
@@ -97,6 +111,57 @@
                 </div>
             </div>
         </section>
+
+        @if (Model?.PesquisaRealizada == true && Model?.Agendamentos != null && Model.Agendamentos.Any())
+        {
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fa fa-list"></i> Resultado da pesquisa</h3>
+                                </div>
+                                <div class="card-body">
+                                    <table id="tablePlantao" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>CPF</th>
+                                                <th>E-mail</th>
+                                                <th>Data do Agendamento</th>
+                                                <th>Horário</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model != null && Model.Agendamentos.Any())
+                                            {
+                                                @foreach (var item in Model.Agendamentos)
+                                                {
+                                                    <tr>
+                                                        <td>@item.Nome</td>
+                                                        <td>@item.CpfCnpj</td>
+                                                        <td>@item.Email</td>
+                                                        <td>@item.DataMarcada</td>
+                                                        <td>@item.Hora</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="1" class="text-center">Nenhum resultado encontrado.</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
     </div>
 
     <footer class="main-footer">

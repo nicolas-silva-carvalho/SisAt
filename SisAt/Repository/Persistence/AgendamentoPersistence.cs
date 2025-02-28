@@ -73,5 +73,19 @@ namespace SisAt.Repository.Persistence
         {
             throw new NotImplementedException();
         }
+
+        public async Task<List<Agendamento>> PegarAgendamentosPorProtocoloECPF(string protocolo, string cpf)
+        {
+            try
+            {
+                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf).Include(x => x.CadastroDeHorarios).Order();
+
+                return await agendamentos.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
