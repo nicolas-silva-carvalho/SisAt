@@ -89,7 +89,6 @@
                             </div>
                             <form asp-action="ConfirmarAgendamento" asp-controller="AgendamentoHorarios" method="post">
                                 <div class="card-body">
-                                    <p>Para confirmar um agendamento pesquise pelo número de protocolo ou CPF.</p>
                                     <div class="form-group">
                                         <label>Protocolo:</label>
                                         <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="Protocolo" asp-for="Protocolo" placeholder="Digite o Protocolo do agendamento." />
@@ -97,12 +96,12 @@
                                     </div>
                                     <div class="form-group">
                                         <label>CPF:</label>
-                                        <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="Protocolo" asp-for="CPF" placeholder="Digite o CPF." />
+                                        <input class="form-control @(ViewData.ModelState["Protocolo"]?.Errors.Count() > 0 ? "is-invalid" : "")" type="text" id="CPF" asp-for="CPF" placeholder="Digite o CPF." />
                                         @Html.ValidationMessageFor(x => x.Protocolo, "", new { @class = "invalid-feedback" })
                                     </div>
                                 </div>
                                 <div class="card-footer d-flex justify-content-end">
-                                    <a class="btn btn-default" role="button"><i class="fa fa-times"></i> Limpar</a>
+                                    <a id="limpar" class="btn btn-default" role="button"><i class="fa fa-times"></i> Limpar</a>
                                     <button type="submit" class="btn btn-primary mx-2" role="button"><i class="fas fa-search"></i> Buscar</button>
                                 </div>
                             </form>
@@ -114,7 +113,7 @@
 
         @if (Model?.PesquisaRealizada == true && Model?.Agendamentos != null && Model.Agendamentos.Any())
         {
-            <section class="content">
+            <section class="content" id="resultadosPesquisa">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col">
@@ -123,7 +122,7 @@
                                     <h3 class="card-title"><i class="fa fa-list"></i> Resultado da pesquisa</h3>
                                 </div>
                                 <div class="card-body">
-                                    <table id="tablePlantao" class="table table-bordered table-striped">
+                                    <table id="tablePesquisa" class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Nome</th>
@@ -142,7 +141,7 @@
                                                         <td>@item.Nome</td>
                                                         <td>@item.CpfCnpj</td>
                                                         <td>@item.Email</td>
-                                                        <td>@item.DataMarcada</td>
+                                                        <td>@item.DataMarcada.ToString("dd/MM/yyyy")</td>
                                                         <td>@item.Hora</td>
                                                     </tr>
                                                 }
@@ -202,6 +201,93 @@
                     $(this).removeClass('is-invalid');
                 }
             });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#limpar').on('click', function (e) {
+                e.preventDefault();
+                $('#Protocolo').val('');
+                $('#CPF').val('');
+                
+                $('#Protocolo').removeClass('is-invalid');
+                $('#CPF').removeClass('is-invalid');
+
+                $('#Protocolo').next('.invalid-feedback').html('');
+                $('#CPF').next('.invalid-feedback').html('');
+
+                $('#resultadosPesquisa').hide();
+            });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#tablePesquisa').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'Exportar em PDF',
+                        orientation: 'portrait',
+                        pageSize: 'A4',
+                        customize: function (doc) {
+                            doc.pageMargins = [10, 20, 20, 20];
+
+                            doc.styles.title = {
+                                fontSize: 18,
+                                bold: true,
+                                alignment: 'center',
+                                margin: [0, 20, 0, 20]
+                            };
+
+                            doc.styles.tableHeader = {
+                                fontSize: 10,
+                                bold: true,
+                                fillColor: '#f0f0f0',
+                                alignment: 'left'
+                            };
+
+                            doc.styles.tableBodyOdd = {
+                                fontSize: 10,
+                                fillColor: '#ffffff',
+                                alignment: 'left'
+                            };
+
+                            doc.styles.tableBodyEven = {
+                                fontSize: 10,
+                                fillColor: '#f9f9f9',
+                                alignment: 'left'
+                            };
+
+                            var table = doc.content[1].table;
+                            table.widths = ['*', '*', '*', '*', '*'];
+
+                            table.body.forEach(function(row, rowIndex) {
+                                row.forEach(function(cell, colIndex) {
+                                    cell.border = [true, true, true, true];
+                                    if (typeof cell.text === 'string') {
+                                        console.log(cell.text);
+                                        cell.text = cell.text.replace(/,\s*\/?/g, '\n');
+                                    }
+                                });
+                            });
+                        },
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }, 'copy', 'csv', 'excel', 'print'
+                ],
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+                },
+                order: [[3, 'asc']],
+            }).buttons().container().appendTo('#tablePesquisa_wrapper .col-md-6:eq(0)');
         });
     </script>
 }
