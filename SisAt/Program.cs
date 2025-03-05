@@ -4,6 +4,7 @@ using SisAt.DataBase;
 using SisAt.Repository.Persistence;
 using SisAt.Repository.Persistence.Interfaces;
 using SisAt.Sessao;
+using SisAt.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,9 @@ builder.Services.AddScoped<ICadastroDeHorariosPersistence, CadastroDeHorariosPer
 builder.Services.AddScoped<IAgendamentoPersistence, AgendamentoPersistence>();
 builder.Services.AddScoped<IImportacaoAPIService, ImportacaoAPIService>();
 builder.Services.AddScoped<IUsuarioPersistence, UsuarioPersistence>();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<ISessaoFactory, SessaoFactory>();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SisAt.API;
 using SisAt.DataBase;
 using SisAt.Models;
 using SisAt.Repository.Persistence.Interfaces;
@@ -9,11 +10,12 @@ namespace SisAt.Repository.Persistence
     {
         public readonly Context _context;
         private readonly ICadastroDeHorariosPersistence _cadastroDeHorarios;
-
-        public AgendamentoPersistence(Context context, ICadastroDeHorariosPersistence cadastroDeHorarios)
+        private readonly IImportacaoAPIService _importacao;
+        public AgendamentoPersistence(Context context, ICadastroDeHorariosPersistence cadastroDeHorarios, IImportacaoAPIService importacao)
         {
             _context = context;
             _cadastroDeHorarios = cadastroDeHorarios;
+            _importacao = importacao;
         }
 
         public Task<Agendamento> AtualizarAgendamentoAsync(int agendamentoId, Agendamento agendamento)
@@ -78,8 +80,7 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf).Include(x => x.CadastroDeHorarios).Order();
-
+                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf && x.DataMarcada.Date >= DateTime.Now.Date && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).Order();
                 return await agendamentos.ToListAsync();
             }
             catch (Exception ex)

@@ -72,6 +72,33 @@ namespace SisAt.API
             return null;
         }
 
+        public async Task<ServicosDadosApi> ServicosApiResponse(int servicoId)
+        {
+            string url = "http://sga2.gnplay.com.br/api-v2/servico/pesquisar/?token=6a878fbb0f5bf5747e565fde63a1996202284654&id_unidade=119";
+            var client = new RestClient();
+            var request = new RestRequest(url, Method.Get);
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                var servicos = JsonConvert.DeserializeObject<ServicosApi>(response.Content);
+
+                foreach (var servico in servicos.dados)
+                {
+                    if(servicoId == servico.id)
+                    {
+                        return servico;
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Erro: " + response.ErrorMessage);
+            }
+
+            return null;
+        }
+
         public async Task<SenhaApi> CriacaoDeSenha(int servicoId, string nome)
         {
             string url = "http://sga2.gnplay.com.br/api-v2/senha/criar/?token=6a878fbb0f5bf5747e565fde63a1996202284654";

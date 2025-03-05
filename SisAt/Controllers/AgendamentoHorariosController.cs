@@ -136,6 +136,13 @@ public class AgendamentoHorariosController : Controller
             if (confirmarAgendamentoViewModel.CPF != null || confirmarAgendamentoViewModel.Protocolo != null)
             {
                 var agendamento = await _agendamento.PegarAgendamentosPorProtocoloECPF(confirmarAgendamentoViewModel.Protocolo, confirmarAgendamentoViewModel.CPF);
+
+                if (agendamento == null || agendamento.Count == 0)
+                {
+                    TempData["Error"] = $"Não foi encontrado nenhum agendamento para o CPF: {confirmarAgendamentoViewModel.CPF} ou Protocolo: {confirmarAgendamentoViewModel.Protocolo}";
+                    return View(confirmarAgendamentoViewModel);
+                }
+
                 var agendamentoMap = _mapper.Map<List<AgendamentoPesquisa>>(agendamento);
                 confirmarAgendamentoViewModel.PesquisaRealizada = true;
                 confirmarAgendamentoViewModel.Agendamentos = agendamentoMap;
@@ -143,6 +150,7 @@ public class AgendamentoHorariosController : Controller
                 return View(confirmarAgendamentoViewModel);
             }
 
+            return null;
 
             //if (ModelState.IsValid)
             //{
@@ -157,8 +165,7 @@ public class AgendamentoHorariosController : Controller
             //    var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
             //    return RedirectToAction("Senha", senhaMap);
             //}
-
-            return View(confirmarAgendamentoViewModel);
+            
         }
         catch (Exception ex)
         {

@@ -11,6 +11,7 @@ namespace SisAt.Models
         public int CadastroDeHorarioId { get; set; }
         public virtual CadastroDeHorarios CadastroDeHorarios { get; set; }
         public int ServicoId { get; set; }
+        public string ServicoNome { get; set; }
         public DateTime DataMarcada { get; set; }
         public string Hora { get; set; }
         public string? Protocolo { get; set; }
