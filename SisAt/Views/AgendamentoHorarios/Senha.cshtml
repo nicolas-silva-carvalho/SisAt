@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Senha";
 }
+<link rel="stylesheet" type="text/css" href="~/css/print.css" media="print" />
 <div class="wrapper">
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
@@ -10,6 +11,14 @@
             </li>
             <li class="nav-item d-none d-sm-inline-block">
                 <a class="nav-link" style="font-weight:700;color:#6c757d!important">SISAT - Sistema de Atendimento</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" style="font-weight:500;color:#6c757d!important">@ViewBag.NomeUsuario</a>
+            </li>
+            <li class="nav-item">
+                <a role="button" class="nav-link" style="font-weight:400;color:#6c757d!important" asp-action="Sair" asp-controller="Home"><i class="fas fa-sign-out-alt" style="margin-right:4px"></i> Sair</a>
             </li>
         </ul>
     </nav>
@@ -76,33 +85,34 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header no-print">
                                 <h3 class="card-title card-success">Senha gerada com sucesso</h3>
                             </div>
-                            <form asp-action="ConfirmarAgendamento" asp-controller="AgendamentoHorarios" method="post">
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Nome: @Model.Cidadao</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Serviço: @Model.Id_servico</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Horário: @Model.Horario</label>
-                                    </div>
+                            <div class="card-body text-center" id="conteudo-impressao">
+                                <div class="form-group">
+                                    <label>SENHA: @Model.Numero</label>
                                 </div>
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-outline-success">Salvar</button>
-                                    <a role="button" class="btn btn-default" asp-action="Index" asp-controller="AgendamentoHorarios">Voltar</a>
+                                <div class="form-group">
+                                    <label>CIDADÃO: @Model.Cidadao</label>
                                 </div>
-                            </form>
+                                <div class="form-group">
+                                    <label>SERVIÇO: @Model.Id_servico</label>
+                                </div>
+                                <div class="form-group">
+                                    <label>RETIRADA: @Model.Horario</label>
+                                </div>
+                                <button onclick="imprimir()">Imprimir</button>
+                            </div>
+                            <div class="card-footer no-print">
+                                <a role="button" class="btn btn-default" asp-action="Index" asp-controller="AgendamentoHorarios">Voltar</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
-    <footer class="main-footer">
+    <footer class="main-footer no-print">
         <strong>&copy; @DateTime.Now.Year - W2E Soluções</strong>
     </footer>
 </div>
@@ -134,12 +144,8 @@
     }
 
     <script>
-        $(document).ready( function() {
-            $('#Protocolo').on('change', function () {
-                if ($(this).hasClass('is-invalid')) {
-                    $(this).removeClass('is-invalid');
-                }
-            });
-        });
+        function imprimir() {
+            window.print();
+        }
     </script>
 }

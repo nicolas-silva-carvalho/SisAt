@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using SisAt.API;
+using SisAt.Filtros;
 using SisAt.Models;
 using SisAt.Repository.Persistence;
 using SisAt.Repository.Persistence.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace SisAt.Controllers;
+[FiltroLimparCache]
 public class AgendamentoController : Controller
 {
     public readonly IImportacaoAPIService _importacao;
@@ -29,6 +31,9 @@ public class AgendamentoController : Controller
     {
         try
         {
+            Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
             ViewBag.MenuAtivo = "Inicio";
             var servicos = await _importacao.ServicosApiResponse();
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
@@ -47,7 +52,6 @@ public class AgendamentoController : Controller
     {
         try
         {
-            ViewBag.MenuAtivo = "Inicio";
             if (ModelState.IsValid && horarioChecked != "[]")
             {
                 if (horarioChecked != null)
@@ -56,15 +60,6 @@ public class AgendamentoController : Controller
                     agendamento.CpfCnpj = cpf;
                     var horario = JsonConvert.DeserializeObject<List<HorarioViewModel>>(horarioChecked);
                     var serv = await _importacao.ServicosApiResponse(agendamento.Id);
-
-                    if (horario.Count > 1)
-                    {
-                        var servicosApi = await _importacao.ServicosApiResponse();
-                        var servicosMappping = _mapper.Map<List<ServicoViewModel>>(servicosApi.dados);
-                        ViewBag.Servicos = new SelectList(servicosMappping, "id", "nome");
-                        TempData["Error"] = "Selecione somente um horário para o agendamento.";
-                        return View(agendamento);
-                    }
 
                     Agendamento ag = new Agendamento()
                     {
@@ -96,13 +91,28 @@ public class AgendamentoController : Controller
                     ag.CadastroDeHorarios = cadastro;
                     var agendamentoRequest = await _agendamento.CadastrarAgendamentoAsync(ag);
                     
-                    var body = Template(agendamentoRequest.Protocolo, agendamentoRequest.Nome, agendamentoRequest.Email, agendamentoRequest.DataMarcada.ToString("dd/MM/yyyy"), agendamentoRequest.Hora, agendamentoRequest.ServicoNome);
-                    await _mailService.SendMailAsync(agendamentoRequest.Nome, agendamentoRequest.Email, "CADASTRO DE AGENDAMENTO - PROTOCOLO DE AGENDAMENTO: " + $"{agendamentoRequest.Protocolo}", body);
+                    if (ag.Email != null)
+                    {
+                        var body = Template(agendamentoRequest.Protocolo, agendamentoRequest.Nome, agendamentoRequest.Email, agendamentoRequest.DataMarcada.ToString("dd/MM/yyyy"), agendamentoRequest.Hora, agendamentoRequest.ServicoNome);
+                        await _mailService.SendMailAsync(agendamentoRequest.Nome, agendamentoRequest.Email, "CADASTRO DE AGENDAMENTO - PROTOCOLO DE AGENDAMENTO: " + $"{agendamentoRequest.Protocolo}", body);
+                    }
+
                     TempData["Sucesso"] = "Agendamento cadastrado com sucesso.";
                     return RedirectToAction("Index", "Agendamento");
                 }
             }
 
+            if (!ModelState.IsValid)
+            {
+                TempData["Calendario"] = true;
+                var servicosApi = await _importacao.ServicosApiResponse();
+                var servicosApiMap = _mapper.Map<List<ServicoViewModel>>(servicosApi.dados);
+                ViewBag.Servicos = new SelectList(servicosApiMap, "id", "nome");
+
+                return View(agendamento);
+            }
+
+            TempData["Info"] = "Por favor, selecione um horário para o agendamento."; 
             var servicos = await _importacao.ServicosApiResponse();
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
             ViewBag.Servicos = new SelectList(servicosMap, "id", "nome");
@@ -127,8 +137,7 @@ public class AgendamentoController : Controller
         }
         catch (Exception ex)
         {
-
-            throw;
+            throw new Exception(ex.Message);
         }
     }
 

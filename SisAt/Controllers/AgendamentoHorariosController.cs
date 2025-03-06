@@ -6,6 +6,7 @@ using SisAt.API;
 using SisAt.Filtros;
 using SisAt.Models;
 using SisAt.Repository.Persistence.Interfaces;
+using SisAt.Sessao;
 
 namespace SisAt.Controllers;
 [FiltroUsuarioLogado]
@@ -15,17 +16,20 @@ public class AgendamentoHorariosController : Controller
     public readonly IImportacaoAPIService _importacao;
     public readonly ICadastroDeHorariosPersistence _cadastro;
     public readonly IAgendamentoPersistence _agendamento;
-    public AgendamentoHorariosController(IMapper mapper, IImportacaoAPIService importacao, ICadastroDeHorariosPersistence cadastro, IAgendamentoPersistence agendamento)
+    public readonly ISessaoFactory _sessao;
+    public AgendamentoHorariosController(IMapper mapper, IImportacaoAPIService importacao, ICadastroDeHorariosPersistence cadastro, IAgendamentoPersistence agendamento, ISessaoFactory sessao)
     {
         _mapper = mapper;
         _importacao = importacao;
         _cadastro = cadastro;
         _agendamento = agendamento;
+        _sessao = sessao;
     }
 
     public IActionResult Index()
     {
         ViewBag.MenuAtivo = "Inicio";
+        ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
         return View();
     }
 
@@ -35,6 +39,7 @@ public class AgendamentoHorariosController : Controller
         {
             ViewBag.MenuAtivo = "Horario";
             ViewBag.ActivePage = "CadastroHorario";
+            ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
             var servicos = await _importacao.ServicosApiResponse();
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
             ViewBag.Servicos = new SelectList(servicosMap, "id", "nome");
@@ -54,6 +59,7 @@ public class AgendamentoHorariosController : Controller
         {
             ViewBag.MenuAtivo = "Horario";
             ViewBag.ActivePage = "CadastroHorario";
+            ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
 
             if (ModelState.IsValid && horariosChecked != "[]" )
             {
@@ -123,6 +129,7 @@ public class AgendamentoHorariosController : Controller
     public IActionResult ConfirmarAgendamento()
     {
         ViewBag.MenuAtivo = "Confirmar";
+        ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
         return View();
     }
 
@@ -132,6 +139,7 @@ public class AgendamentoHorariosController : Controller
         try
         {
             ViewBag.MenuAtivo = "Confirmar";
+            ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
 
             if (confirmarAgendamentoViewModel.CPF != null || confirmarAgendamentoViewModel.Protocolo != null)
             {
@@ -150,22 +158,29 @@ public class AgendamentoHorariosController : Controller
                 return View(confirmarAgendamentoViewModel);
             }
 
-            return null;
+            TempData["Info"] = "Preencha o Protocolo ou CPF do cadastro no agendamento.";
+            return View();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
 
-            //if (ModelState.IsValid)
-            //{
-            //    var senha = await _cadastro.ConfirmarAgendamentoAsync(confirmarAgendamentoViewModel.Protocolo);
+    public async Task<IActionResult> ConfirmarAgendamentoById(int agendamentoId)
+    {
+        try
+        {
+            var senha = await _cadastro.ConfirmarAgendamentoAsync(agendamentoId);
 
-            //    if (senha == null)
-            //    {
-            //        TempData["Error"] = "Houve um erro ao confirmar a senha.";
-            //        return View(confirmarAgendamentoViewModel);
-            //    }
+            if (senha == null)
+            {
+                TempData["Error"] = "Houve um erro ao confirmar a senha.";
+                return RedirectToAction("ConfirmarAgendamento", "AgendamentoHorarios");
+            }
 
-            //    var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
-            //    return RedirectToAction("Senha", senhaMap);
-            //}
-            
+            var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
+            return RedirectToAction("Senha", senhaMap);
         }
         catch (Exception ex)
         {
@@ -175,6 +190,7 @@ public class AgendamentoHorariosController : Controller
 
     public IActionResult Senha(SenhaViewlModel senha)
     {
+        ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
         return View(senha);
     }
 }

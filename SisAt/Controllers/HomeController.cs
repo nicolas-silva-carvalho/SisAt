@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SisAt.API;
 using SisAt.Helper;
 using SisAt.Models;
 using SisAt.Repository.Persistence.Interfaces;
@@ -24,6 +22,9 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private";
+        Response.Headers["Pragma"] = "no-cache";
+        Response.Headers["Expires"] = "0";
         return View();
     }
 
@@ -88,5 +89,11 @@ public class HomeController : Controller
 
             throw new Exception($"Erro {ex.Message}");
         }
+    }
+
+    public IActionResult Sair()
+    {
+        _sessao.RemoverSessaoPorId();
+        return RedirectToAction("Index", "Home");
     }
 }

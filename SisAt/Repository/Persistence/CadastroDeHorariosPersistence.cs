@@ -199,9 +199,9 @@ namespace SisAt.Repository.Persistence
             }
         }
 
-        public async Task<SisAt.Models.Senha> ConfirmarAgendamentoAsync(string protocolo)
+        public async Task<SisAt.Models.Senha> ConfirmarAgendamentoAsync(int agendamentoId)
         {
-            var agendamento = await _context.Agendamentos.Where(x => x.Protocolo == protocolo && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).FirstOrDefaultAsync();
+            var agendamento = await _context.Agendamentos.Where(x => x.Id == agendamentoId && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).FirstOrDefaultAsync();
 
             if (agendamento == null) return null;
 
