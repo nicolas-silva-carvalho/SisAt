@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SisAt.Models
+﻿namespace SisAt.Models
 {
     public class ConfirmarAgendamentoViewModel
     {
@@ -8,5 +6,6 @@ namespace SisAt.Models
         public string? CPF { get; set; }
         public List<AgendamentoPesquisa> Agendamentos { get; set; }
         public bool PesquisaRealizada { get; set; }
+        public SenhaViewlModel? SenhaViewlModel { get; set; }
     }
 }

@@ -87,7 +87,7 @@ public class AgendamentoHorariosController : Controller
 
             if (ModelState.IsValid && horariosChecked == "[]")
             {
-                TempData["Error"] = "Selecione pelo menos um horário para o serviço";
+                TempData["Info"] = "Selecione pelo menos um horário para o serviço";
                 var servicosRetorno = await _importacao.ServicosApiResponse();
                 var servicosMapping = _mapper.Map<List<ServicoViewModel>>(servicosRetorno.dados);
                 ViewBag.Servicos = new SelectList(servicosMapping, "id", "nome");
@@ -130,6 +130,16 @@ public class AgendamentoHorariosController : Controller
     {
         ViewBag.MenuAtivo = "Confirmar";
         ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
+
+        if (TempData["Senha"] != null)
+        {
+            ConfirmarAgendamentoViewModel confirmarAgendamentoViewModel = new ConfirmarAgendamentoViewModel();
+            confirmarAgendamentoViewModel.SenhaViewlModel = Newtonsoft.Json.JsonConvert
+                .DeserializeObject<SenhaViewlModel>(TempData["Senha"].ToString());
+
+            return View(confirmarAgendamentoViewModel);
+        }
+
         return View();
     }
 
@@ -180,7 +190,8 @@ public class AgendamentoHorariosController : Controller
             }
 
             var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
-            return RedirectToAction("Senha", senhaMap);
+            TempData["Senha"] = Newtonsoft.Json.JsonConvert.SerializeObject(senhaMap);
+            return RedirectToAction("ConfirmarAgendamento");
         }
         catch (Exception ex)
         {
