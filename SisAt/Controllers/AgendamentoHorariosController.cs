@@ -134,7 +134,7 @@ public class AgendamentoHorariosController : Controller
         if (TempData["Senha"] != null)
         {
             ConfirmarAgendamentoViewModel confirmarAgendamentoViewModel = new ConfirmarAgendamentoViewModel();
-            confirmarAgendamentoViewModel.SenhaViewlModel = Newtonsoft.Json.JsonConvert
+            confirmarAgendamentoViewModel.SenhaViewlModel = JsonConvert
                 .DeserializeObject<SenhaViewlModel>(TempData["Senha"].ToString());
 
             return View(confirmarAgendamentoViewModel);
@@ -190,7 +190,7 @@ public class AgendamentoHorariosController : Controller
             }
 
             var senhaMap = _mapper.Map<SenhaViewlModel>(senha);
-            TempData["Senha"] = Newtonsoft.Json.JsonConvert.SerializeObject(senhaMap);
+            TempData["Senha"] = JsonConvert.SerializeObject(senhaMap);
             return RedirectToAction("ConfirmarAgendamento");
         }
         catch (Exception ex)

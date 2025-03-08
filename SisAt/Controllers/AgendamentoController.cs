@@ -39,6 +39,15 @@ public class AgendamentoController : Controller
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
             ViewBag.Servicos = new SelectList(servicosMap, "id", "nome");
 
+            
+            if (TempData["Agendamento"] != null)
+            {
+                AgendamentoViewModel agendamentoViewModel = new AgendamentoViewModel();
+                agendamentoViewModel.AgendamentoReturnViewl = JsonConvert.DeserializeObject<AgendamentoReturnViewl>(TempData["Agendamento"].ToString());
+
+                return View(agendamentoViewModel);
+            }
+
             return View();
         }
         catch (Exception ex)
@@ -98,6 +107,17 @@ public class AgendamentoController : Controller
                     }
 
                     TempData["Sucesso"] = "Agendamento cadastrado com sucesso.";
+
+                    AgendamentoReturnViewl agendamentoReturnViewl = new AgendamentoReturnViewl()
+                    {
+                        Nome = agendamentoRequest.Nome,
+                        Hora = agendamentoRequest.Hora,
+                        DataMarcada = agendamentoRequest.DataMarcada,
+                        Protocolo = agendamentoRequest.Protocolo,
+                        ServicoNome = agendamentoRequest.ServicoNome
+                    };
+
+                    TempData["Agendamento"] = JsonConvert.SerializeObject(agendamentoReturnViewl);
                     return RedirectToAction("Index", "Agendamento");
                 }
             }

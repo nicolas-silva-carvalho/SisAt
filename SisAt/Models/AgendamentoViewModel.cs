@@ -12,5 +12,6 @@ namespace SisAt.Models
         [Required(ErrorMessage = "Informar o nome é obrigatório")]
         public string Nome { get; set; }
         public string? Email { get; set; }
+        public AgendamentoReturnViewl? AgendamentoReturnViewl { get; set; }
     }
 }

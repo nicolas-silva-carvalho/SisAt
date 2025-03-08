@@ -274,6 +274,53 @@
         </section>
     </div>
 
+    @if (Model?.AgendamentoReturnViewl != null)
+    {
+        <div class="modal fade" id="modal-primary">
+            <div class="modal-dialog">
+                <div class="modal-content bg-default">
+                    <div class="modal-header bg-dark ">
+                        <h4 class="modal-title">Agendamento</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="conteudo-impressao">
+                        <div class="form-group">
+                            <label>CIDADÃO: @Model.AgendamentoReturnViewl.Nome</label>
+                        </div>
+                        <div class="form-group">
+                            <label>PROTOCOLO: @Model.AgendamentoReturnViewl.Protocolo</label>
+                        </div>
+                        <div class="form-group">
+                            <label>SERVIÇO: @Model.AgendamentoReturnViewl.ServicoNome</label>
+                        </div>
+                        <div class="form-group">
+                            <label>DATA MARCADA: @Model.AgendamentoReturnViewl.DataMarcada?.ToString("dd/MM/yyyy")</label>
+                        </div>
+                        <div class="form-group">
+                            <label>HORÁRIO: @Model.AgendamentoReturnViewl.Hora</label>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="form-group text-justify">
+                            <label>Observações: </label>
+                            <ul style="list-style-type: none; padding-left: 0;">
+                                <li class="nav-item">
+                                    <a class="nav-link text-justify" style="font-weight:400;color:#6c757d!important;padding-left: 0;padding-right: 0;">Por favor, chegar com antecendência no horário agendado e dirigir-se ao guichê de atendimento.</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
+                        <button type="button" class="btn btn-dark" id="imprimir"><i class="fa fa-print"></i> Imprimir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <footer class="main-footer" style="margin-left:0">
         <strong>&copy; @DateTime.Now.Year - W2E Soluções</strong>
     </footer>
@@ -619,4 +666,13 @@
             });
         });
     </script>
+
+    @if (Model?.AgendamentoReturnViewl != null)
+    {
+        <script>
+            $(document).ready(function() {
+                $('#modal-primary').modal('show');
+            });
+        </script>
+    }
 }
