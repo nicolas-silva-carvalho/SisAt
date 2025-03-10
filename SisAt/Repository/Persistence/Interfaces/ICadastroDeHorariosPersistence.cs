@@ -1,4 +1,5 @@
 ﻿using SisAt.Models;
+using SisAt.Models.ViewModel;
 
 namespace SisAt.Repository.Persistence.Interfaces
 {

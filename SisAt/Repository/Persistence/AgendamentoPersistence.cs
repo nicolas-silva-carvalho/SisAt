@@ -27,7 +27,6 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                
                 _context.Agendamentos.Add(agendamento);
                 await _context.SaveChangesAsync();
                 agendamento.Protocolo = $"{agendamento.DataMarcada.Day}" + $"{agendamento.DataMarcada.Month}" + $"{agendamento.DataMarcada.Year}" + $"{agendamento.ServicoId}" + $"{agendamento.Id}";
@@ -80,7 +79,7 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf && x.DataMarcada.Date >= DateTime.Now.Date && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).Order();
+                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf && x.DataMarcada.Date == DateTime.Now.Date && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).Order();
                 return await agendamentos.ToListAsync();
             }
             catch (Exception ex)

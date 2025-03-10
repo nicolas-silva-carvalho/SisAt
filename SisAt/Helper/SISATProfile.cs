@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SisAt.API;
 using SisAt.Models;
+using SisAt.Models.ViewModel;
 
 namespace SisAt.Helper
 {
@@ -15,8 +16,8 @@ namespace SisAt.Helper
             CreateMap<AgendamentoViewModel, Agendamento>().ReverseMap();
             CreateMap<ServicoViewModel, ServicosDadosApi>().ReverseMap();
             CreateMap<CadastroDeHorariosViewModel, CadastroDeHorarios>().ReverseMap();
-            CreateMap<SenhaDadosApi, SisAt.Models.Senha>().ReverseMap();
-            CreateMap<SenhaViewlModel, SisAt.Models.Senha>().ReverseMap();
+            CreateMap<SenhaDadosApi, Models.ViewModel.Senha>().ReverseMap();
+            CreateMap<SenhaViewlModel, Models.ViewModel.Senha>().ReverseMap();
             CreateMap<AgendamentoPesquisa, Agendamento>().ReverseMap();
         }
     }

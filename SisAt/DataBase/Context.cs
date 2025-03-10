@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SisAt.Models;
+using System.Reflection;
 
 namespace SisAt.DataBase
 {
@@ -9,5 +10,10 @@ namespace SisAt.DataBase
         public DbSet<Agendamento> Agendamentos { get; set; }
         public DbSet<Horarios> Horarios { get; set; }
         public DbSet<CadastroDeHorarios> CadastroDeHorarios { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
     }
 }

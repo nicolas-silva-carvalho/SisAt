@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SisAt.Models
+namespace SisAt.Models.ViewModel
 {
     public class RegistrarUsuarioRequestDto
     {

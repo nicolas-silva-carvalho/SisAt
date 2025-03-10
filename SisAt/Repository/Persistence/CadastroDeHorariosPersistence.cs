@@ -199,7 +199,7 @@ namespace SisAt.Repository.Persistence
             }
         }
 
-        public async Task<SisAt.Models.Senha> ConfirmarAgendamentoAsync(int agendamentoId)
+        public async Task<Models.ViewModel.Senha> ConfirmarAgendamentoAsync(int agendamentoId)
         {
             var agendamento = await _context.Agendamentos.Where(x => x.Id == agendamentoId && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).FirstOrDefaultAsync();
 
@@ -215,7 +215,7 @@ namespace SisAt.Repository.Persistence
                 _context.Agendamentos.Update(agendamento);
                 await _context.SaveChangesAsync();
                 var response = await _importacao.CriacaoDeSenha(agendamento.ServicoId, agendamento.Nome);
-                var senha = _mapper.Map<SisAt.Models.Senha>(response.dados.senha);
+                var senha = _mapper.Map<Models.ViewModel.Senha>(response.dados.senha);
                 return senha;
             }
 

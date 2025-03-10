@@ -1,4 +1,4 @@
-﻿namespace SisAt.Models
+﻿namespace SisAt.Models.ViewModel
 {
     public class LocaisViewModel
     {

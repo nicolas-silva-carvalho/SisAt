@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SisAt.Helper;
 using SisAt.Models;
+using SisAt.Models.ViewModel;
 using SisAt.Repository.Persistence.Interfaces;
 using SisAt.Sessao;
 

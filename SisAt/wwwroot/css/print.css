@@ -2,45 +2,44 @@
 @media print {
 
     @page {
-        size: 80mm auto !important;
-        margin: 0 !important;
-        ;
+        size: 80mm auto;
+        margin: 0;
     }
 
-    .modal-body {
-        font-family: Arial, sans-serif !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 80mm !important;
-        background: none !important;
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        width: 80mm;
+        background: none;
     }
 
     #conteudo-impressao {
-        width: 80mm !important;
-        padding: 10mm !important;
-        box-sizing: border-box !important;
+        width: 80mm;
+        padding: 10mm;
+        box-sizing: border-box;
     }
 
     .form-group {
-        margin-bottom: 5mm !important;
+        margin-bottom: 5mm;
     }
 
     label {
-        font-size: 14px !important;
-        display: block !important;
-        margin-bottom: 2mm !important;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 2mm;
     }
 
     .form-group label {
-        font-weight: normal !important;
+        font-weight: normal;
     }
 
     button {
-        display: none !important;
+        display: none;
     }
 
     .print {
-        display: block !important;
+        display: block;
     }
 
     .no-print {

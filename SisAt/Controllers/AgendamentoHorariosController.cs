@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using SisAt.API;
 using SisAt.Filtros;
 using SisAt.Models;
+using SisAt.Models.ViewModel;
 using SisAt.Repository.Persistence.Interfaces;
 using SisAt.Sessao;
 
