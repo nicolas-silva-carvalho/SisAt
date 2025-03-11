@@ -75,13 +75,11 @@ namespace SisAt.Repository.Persistence
             throw new NotImplementedException();
         }
 
-        public async Task<List<Calendario>> PegarTodosOsAgendamentoCalendarioAsync()
+        public async Task<List<Calendario>> PegarTodosOsAgendamentoCalendarioAsync(int mes)
         {
             try
             {
-                var calendarios = await _context.Calendarios.Order().ToListAsync();
-
-                return calendarios;
+                return await _context.Calendarios.Where(x => x.start.Month == mes).AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
             {

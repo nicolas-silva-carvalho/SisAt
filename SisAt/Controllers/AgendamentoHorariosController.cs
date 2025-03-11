@@ -34,7 +34,7 @@ public class AgendamentoHorariosController : Controller
         TimeSpan tempoSessao = _sessao.RecuperarTempoSessao();
         ViewBag.TempoSessao = tempoSessao.ToString(@"hh\:mm\:ss");
 
-        var calendario = await _agendamento.PegarTodosOsAgendamentoCalendarioAsync();
+        var calendario = await _agendamento.PegarTodosOsAgendamentoCalendarioAsync(DateTime.Now.Month);
 
         if (calendario.Count > 0 || calendario != null)
         {

@@ -23,7 +23,7 @@ namespace SisAt.DataBase.Mapping
                 .IsRequired(true);
 
             builder.Property(x => x.end)
-                .HasColumnName("end")
+                .HasColumnName("endDate")
                 .HasColumnType("DATETIME")
                 .IsRequired(true);
 

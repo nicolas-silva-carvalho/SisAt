@@ -131,7 +131,7 @@
         <div class="modal fade" id="modal-xl-Agendamento">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content bg-light">
-                    <div class="modal-header bg-dark">
+                    <div class="modal-header bg-dark" id="headerModal">
                         <h4 class="modal-title" id="titulo"></h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
                             <span aria-hidden="true">&times;</span>
@@ -155,6 +155,15 @@
                         </div>
                         <div class="form-group d-flex">
                             <label>HORÁRIO: </label><p id="horario" style="margin-left:8px;"></p>
+                        </div>
+                        <div class="form-group d-flex">
+                            <label id="confirmacaoText"> </label>
+                            <div class="form-group clearfix" style="margin-left:8px;">
+                                <div class="icheck-success d-inline" id="divConfirmacao">
+                                    <input type="checkbox" id="checkConfirmado" disabled>
+                                    <label for="checkConfirmado"></label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">
@@ -204,7 +213,6 @@
            if (hidenEvento) {
                var eventos = JSON.parse(hidenEvento);
                eventoData.push(eventos);
-               console.log(eventos);
            }
 
           var Calendar = FullCalendar.Calendar;
@@ -223,13 +231,11 @@
             events: eventos,
             eventClick: function(event) {
                 var agendamentoId = event.event._def.extendedProps.AgendamentoId;
-                console.log(agendamentoId);
                 $('#modal-xl-Agendamento').modal('show');
                 $.ajax({
                     url: '@Url.Action("AgendamentoById", "Agendamento", new { id = "__id__" })'.replace('__id__', agendamentoId),
                     type: 'GET',
                     success: function(response) {
-                        console.log(response);
                         var titulo = document.getElementById("titulo").innerText = 'Agendamento - ' + response.servicoNome + ' - ' + response.nome;
                         const formatador = new Intl.DateTimeFormat('pt-BR', {
                                 day: "2-digit",
@@ -244,30 +250,65 @@
                         var dataMarcada = document.getElementById("dataMarcada").innerText  = dataFormatada;
                         var horario = document.getElementById("horario").innerText  = response.hora;
                         var cpf = document.getElementById("cpf").innerText  = response.cpfCnpj;
+                        var confirmacao = response.confirmarAgendamento;
+                        var inputConfirmacao = document.getElementById("checkConfirmado");
+                        var divConfirmacao = document.getElementById("divConfirmacao");
+                        var headerModal = document.getElementById("headerModal");
+                        var confirmacaoText = document.getElementById("confirmacaoText");
+                        if (confirmacao === true) {
+                            headerModal.classList.remove('bg-dark', 'bg-danger');
+                            headerModal.classList.add('bg-success');
+                            inputConfirmacao.checked = true;
+                            divConfirmacao.classList.add('icheck-success');
+                            confirmacaoText.innerHTML = "Agendamento Confirmado: ";
+                        }
+                        else if (confirmacao === null) {
+                            headerModal.classList.remove('bg-success', 'bg-danger');
+                            headerModal.classList.add('bg-dark');
+                            inputConfirmacao.checked = false;
+                            confirmacaoText.innerHTML = "Aguardando Confirmação: ";
+                        }
+                        else if (confirmacao === false) {
+                            headerModal.classList.remove('bg-dark', 'bg-success');
+                            headerModal.classList.add('bg-danger');
+                            divConfirmacao.classList.add('icheck-danger');
+                            confirmacaoText.innerHTML = "Agendamento Não Confirmação: ";
+                            inputConfirmacao.checked = true;
+                        }
                     },
                     error: function(error) {
 
                     }
                 });
             },
-            selectable: true,
-            select: function (start) {
-              const formatador = new Intl.DateTimeFormat('pt-BR', {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric"
-              });
+            datesSet: function(info) {
+                console.log("pulei o mes");
+                var mesAtual = info.view.currentStart.getMonth() + 1;
+                console.log(mesAtual);
+                var anoAtual = info.view.currentStart.getFullYear();
+                $.ajax({
+                    url: '@Url.Action("AgendamentosPorMes", "Agendamento", new { mes = "__mes__" })'.replace('__mes__', mesAtual),
+                    type: 'GET',
+                    success: function(response) {
+                        calendar.removeAllEvents();
+                        calendar.addEventSource(response);
+                    },
+                    error: function(error) {
 
-              var dataFormatada = formatador.format(start.start);
+                    }
+                });
 
-              $('#modal-xl').modal('show');
             },
             editable  : true,
             droppable : true,
           });
 
           calendar.render();
+
+            setTimeout(() => {
+                document.querySelector('.fc-next-button').setAttribute('title', 'Próximo mês');
+                document.querySelector('.fc-prev-button').setAttribute('title', 'Mês anterior');
+            }, 500);
         });
     </script>
-
 }

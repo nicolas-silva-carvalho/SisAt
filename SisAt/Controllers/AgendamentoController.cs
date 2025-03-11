@@ -8,6 +8,7 @@ using SisAt.Models;
 using SisAt.Models.ViewModel;
 using SisAt.Repository.Persistence;
 using SisAt.Repository.Persistence.Interfaces;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace SisAt.Controllers;
@@ -231,6 +232,26 @@ public class AgendamentoController : Controller
             }
 
             return Json(agendamento);
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> AgendamentosPorMesAsync(int mes)
+    {
+        try
+        {
+            var agendamentos = await _agendamento.PegarTodosOsAgendamentoCalendarioAsync(mes);
+
+            if (agendamentos == null || !agendamentos.Any())
+            {
+                return Json(new { success = false, message = $"Não foram encontrados agendamentos para o mês {mes}." });
+            }
+
+            var calendarioMap = _mapper.Map<List<CalendarioViewlModel>>(agendamentos);
+            return Json(calendarioMap);
         }
         catch (Exception ex)
         {
