@@ -11,5 +11,6 @@ namespace SisAt.Repository.Persistence.Interfaces
         Task<bool> DeletarAgendamentoAsync(int agendamentoId);
         Task<bool> ConfirmarAgendamentoAsync(int agendamentId);
         Task<List<Agendamento>> PegarAgendamentosPorProtocoloECPF(string protocolo, string cpf);
+        Task<Calendario> AdicionarCalendarioAsync(Calendario calendario);
     }
 }

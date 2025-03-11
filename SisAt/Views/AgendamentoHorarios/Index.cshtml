@@ -125,8 +125,9 @@
             </div>
         </section>
     </div>
-    <footer class="main-footer">
+    <footer class="main-footer d-flex justify-content-between">
         <strong>&copy; @DateTime.Now.Year - W2E Soluções</strong>
+        <strong id="tempoSessao"></strong>
     </footer>
 </div>
 
@@ -155,6 +156,22 @@
             });
         </script>
     }
+
+    <script>
+        function atualizarTempoSessao() {
+            var tempoInicioSessao = new Date('@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")');
+            var tempoAtual = new Date();
+            var tempoSessao = new Date(tempoAtual - tempoInicioSessao);
+
+            var horas = String(tempoSessao.getUTCHours()).padStart(2, '0');
+            var minutos = String(tempoSessao.getUTCMinutes()).padStart(2, '0');
+            var segundos = String(tempoSessao.getUTCSeconds()).padStart(2, '0');
+
+            document.getElementById('tempoSessao').innerText = 'Tempo Sessão: ' + horas + ':' + minutos + ':' + segundos;
+        }
+
+        setInterval(atualizarTempoSessao, 1000);
+    </script>
 
     <script>
         $(function () {

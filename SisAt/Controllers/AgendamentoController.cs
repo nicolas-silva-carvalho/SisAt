@@ -107,6 +107,20 @@ public class AgendamentoController : Controller
                         await _mailService.SendMailAsync(agendamentoRequest.Nome, agendamentoRequest.Email, "CADASTRO DE AGENDAMENTO - PROTOCOLO DE AGENDAMENTO: " + $"{agendamentoRequest.Protocolo}", body);
                     }
 
+                    Calendario calendario = new Calendario()
+                    {
+                        title = $"{agendamentoRequest.ServicoNome} - {agendamentoRequest.Nome}",
+                        start = Convert.ToDateTime($"{agendamentoRequest.DataMarcada.Date} {agendamentoRequest.Hora}"),
+                        allDay = false,
+                        end = Convert.ToDateTime($"{agendamentoRequest.DataMarcada.Date} {agendamentoRequest.Hora}").AddMinutes(30),
+                        backgroundColor = "#FFF",
+                        borderColor = "#FFF",
+                        Agendamento = agendamentoRequest,
+                        AgendamentoId = agendamentoRequest.Id
+                    };
+
+                    await _agendamento.AdicionarCalendarioAsync(calendario);
+
                     TempData["Sucesso"] = "Agendamento cadastrado com sucesso.";
 
                     AgendamentoReturnViewl agendamentoReturnViewl = new AgendamentoReturnViewl()

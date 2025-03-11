@@ -31,6 +31,8 @@ public class AgendamentoHorariosController : Controller
     {
         ViewBag.MenuAtivo = "Inicio";
         ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
+        TimeSpan tempoSessao = _sessao.RecuperarTempoSessao();
+        ViewBag.TempoSessao = tempoSessao.ToString(@"hh\:mm\:ss");
         return View();
     }
 

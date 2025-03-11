@@ -6,6 +6,7 @@ namespace SisAt.Sessao
     {
         void CriarSessao(Usuario usuario);
         Usuario RecuperarSessaoId();
+        TimeSpan RecuperarTempoSessao();
         void RemoverSessaoPorId();
     }
 }

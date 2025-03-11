@@ -75,6 +75,34 @@ namespace SisAt.Repository.Persistence
             throw new NotImplementedException();
         }
 
+        public async Task<List<Calendario>> PegarTodosOsAgendamentoCalendarioAsync()
+        {
+            try
+            {
+                var calendarios = await _context.Calendarios.Order().ToListAsync();
+
+                return calendarios;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<Calendario> AdicionarCalendarioAsync(Calendario calendario)
+        {
+            try
+            {
+                _context.Calendarios.Add(calendario);
+                await _context.SaveChangesAsync();
+                return calendario;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<List<Agendamento>> PegarAgendamentosPorProtocoloECPF(string protocolo, string cpf)
         {
             try
