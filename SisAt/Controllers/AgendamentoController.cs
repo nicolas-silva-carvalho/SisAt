@@ -107,15 +107,19 @@ public class AgendamentoController : Controller
                         await _mailService.SendMailAsync(agendamentoRequest.Nome, agendamentoRequest.Email, "CADASTRO DE AGENDAMENTO - PROTOCOLO DE AGENDAMENTO: " + $"{agendamentoRequest.Protocolo}", body);
                     }
 
+                    string start = $"{agendamentoRequest.DataMarcada.Date.ToString("dd/MM/yyyy")} {agendamentoRequest.Hora}";
+                    DateTime startDateTime = Convert.ToDateTime(start);
+                    DateTime endDateTime = startDateTime.AddMinutes(30);
+
                     Calendario calendario = new Calendario()
                     {
                         title = $"{agendamentoRequest.ServicoNome} - {agendamentoRequest.Nome}",
-                        start = Convert.ToDateTime($"{agendamentoRequest.DataMarcada.Date} {agendamentoRequest.Hora}"),
+                        start = startDateTime,
                         allDay = false,
-                        end = Convert.ToDateTime($"{agendamentoRequest.DataMarcada.Date} {agendamentoRequest.Hora}").AddMinutes(30),
-                        backgroundColor = "#FFF",
-                        borderColor = "#FFF",
-                        Agendamento = agendamentoRequest,
+                        end = endDateTime,
+                        backgroundColor = "#dc3545",
+                        borderColor = "#dc3545",
+                        Agendamento = ag,
                         AgendamentoId = agendamentoRequest.Id
                     };
 
@@ -208,6 +212,25 @@ public class AgendamentoController : Controller
             }
 
             return Json(new { success = true, horarios = horarios });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = ex.Message });
+        }
+    }
+
+    public async Task<IActionResult> AgendamentoByIdAsync(int id)
+    {
+        try
+        {
+            var agendamento = await _agendamento.PegarAtendimentoPorIdAsync(id);
+
+            if (agendamento == null)
+            {
+                return Json(new { success = false, message = "Não foi encontrado um agendamento." });
+            }
+
+            return Json(agendamento);
         }
         catch (Exception ex)
         {

@@ -27,12 +27,23 @@ public class AgendamentoHorariosController : Controller
         _sessao = sessao;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewBag.MenuAtivo = "Inicio";
         ViewBag.NomeUsuario = _sessao.RecuperarSessaoId().Nome;
         TimeSpan tempoSessao = _sessao.RecuperarTempoSessao();
         ViewBag.TempoSessao = tempoSessao.ToString(@"hh\:mm\:ss");
+
+        var calendario = await _agendamento.PegarTodosOsAgendamentoCalendarioAsync();
+
+        if (calendario.Count > 0 || calendario != null)
+        {
+            var calendarioMap = _mapper.Map<List<CalendarioViewlModel>>(calendario);
+            var serialize = JsonConvert.SerializeObject(calendarioMap);
+            ViewBag.Calendario = serialize;
+            return View();
+        }
+
         return View();
     }
 

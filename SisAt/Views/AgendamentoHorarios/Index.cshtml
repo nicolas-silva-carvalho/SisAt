@@ -1,4 +1,5 @@
-﻿@{
+﻿@using SisAt.Models.ViewModel
+@{
     ViewData["Title"] = "Ínicio";
 }
 
@@ -122,12 +123,50 @@
                         <div id="calendar" style="width:100%;"></div>
                     </div>
                 </div>
+
+                <input type="hidden" id="eventosData" name="eventos" value="@ViewBag.Calendario"/>
             </div>
         </section>
+
+        <div class="modal fade" id="modal-xl-Agendamento">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content bg-light">
+                    <div class="modal-header bg-dark">
+                        <h4 class="modal-title" id="titulo"></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group d-flex">
+                            <label style="font-size:16px">CIDADÃO: </label><p id="cidadao" style="margin-left:8px;"></p>
+                        </div>
+                        <div class="form-group d-flex">
+                            <label>CPF: </label><p id="cpf" style="margin-left:8px;"></p>
+                        </div>
+                        <div class="form-group d-flex">
+                            <label>PROTOCOLO: </label><p id="protocolo" style="margin-left:8px;"></p>
+                        </div>
+                        <div class="form-group d-flex">
+                            <label>SERVIÇO: </label><p id="servico" style="margin-left:8px;"></p>
+                        </div>
+                        <div class="form-group d-flex">
+                            <label>DATA MARCADA: </label><p id="dataMarcada" style="margin-left:8px;"></p>
+                        </div>
+                        <div class="form-group d-flex">
+                            <label>HORÁRIO: </label><p id="horario" style="margin-left:8px;"></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-dark">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <footer class="main-footer d-flex justify-content-between">
+    <footer class="main-footer">
         <strong>&copy; @DateTime.Now.Year - W2E Soluções</strong>
-        <strong id="tempoSessao"></strong>
     </footer>
 </div>
 
@@ -158,23 +197,16 @@
     }
 
     <script>
-        function atualizarTempoSessao() {
-            var tempoInicioSessao = new Date('@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")');
-            var tempoAtual = new Date();
-            var tempoSessao = new Date(tempoAtual - tempoInicioSessao);
-
-            var horas = String(tempoSessao.getUTCHours()).padStart(2, '0');
-            var minutos = String(tempoSessao.getUTCMinutes()).padStart(2, '0');
-            var segundos = String(tempoSessao.getUTCSeconds()).padStart(2, '0');
-
-            document.getElementById('tempoSessao').innerText = 'Tempo Sessão: ' + horas + ':' + minutos + ':' + segundos;
-        }
-
-        setInterval(atualizarTempoSessao, 1000);
-    </script>
-
-    <script>
         $(function () {
+           var hidenEvento = document.getElementById("eventosData").value;
+           var eventoData = [];
+
+           if (hidenEvento) {
+               var eventos = JSON.parse(hidenEvento);
+               eventoData.push(eventos);
+               console.log(eventos);
+           }
+
           var Calendar = FullCalendar.Calendar;
           var calendarEl = document.getElementById('calendar');
 
@@ -188,8 +220,35 @@
             },
             buttonText: { today: 'Hoje', month: 'Mês', week: 'Semana', day: 'Dia' },
             themeSystem: 'bootstrap',
-            events: [],
+            events: eventos,
             eventClick: function(event) {
+                var agendamentoId = event.event._def.extendedProps.AgendamentoId;
+                console.log(agendamentoId);
+                $('#modal-xl-Agendamento').modal('show');
+                $.ajax({
+                    url: '@Url.Action("AgendamentoById", "Agendamento", new { id = "__id__" })'.replace('__id__', agendamentoId),
+                    type: 'GET',
+                    success: function(response) {
+                        console.log(response);
+                        var titulo = document.getElementById("titulo").innerText = 'Agendamento - ' + response.servicoNome + ' - ' + response.nome;
+                        const formatador = new Intl.DateTimeFormat('pt-BR', {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric"
+                        });
+                        const date = new Date(response.dataMarcada);
+                        var dataFormatada = formatador.format(date);
+                        var cidadao = document.getElementById("cidadao").innerText  = response.nome;
+                        var protocolo = document.getElementById("protocolo").innerText  = response.protocolo;
+                        var servico = document.getElementById("servico").innerText  = response.servicoNome;
+                        var dataMarcada = document.getElementById("dataMarcada").innerText  = dataFormatada;
+                        var horario = document.getElementById("horario").innerText  = response.hora;
+                        var cpf = document.getElementById("cpf").innerText  = response.cpfCnpj;
+                    },
+                    error: function(error) {
+
+                    }
+                });
             },
             selectable: true,
             select: function (start) {

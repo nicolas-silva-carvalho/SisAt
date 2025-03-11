@@ -214,6 +214,14 @@ namespace SisAt.Repository.Persistence
                 agendamento.ConfirmarAgendamento = true;
                 _context.Agendamentos.Update(agendamento);
                 await _context.SaveChangesAsync();
+                var calendario = await _context.Calendarios.Where(x => x.AgendamentoId == agendamentoId).FirstOrDefaultAsync();
+                if (calendario != null)
+                {
+                    calendario.backgroundColor = "#28a745";
+                    calendario.borderColor = "#28a745";
+                    _context.Calendarios.Update(calendario);
+                    await _context.SaveChangesAsync();
+                }
                 var response = await _importacao.CriacaoDeSenha(agendamento.ServicoId, agendamento.Nome);
                 var senha = _mapper.Map<Models.ViewModel.Senha>(response.dados.senha);
                 return senha;
