@@ -13,5 +13,6 @@ namespace SisAt.Repository.Persistence.Interfaces
         Task<List<Agendamento>> PegarAgendamentosPorProtocoloECPF(string protocolo, string cpf);
         Task<List<Calendario>> PegarTodosOsAgendamentoCalendarioAsync(int mes);
         Task<Calendario> AdicionarCalendarioAsync(Calendario calendario);
+        Task AtualizarAgendamentosJobAsync();
     }
 }

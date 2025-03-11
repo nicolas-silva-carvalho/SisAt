@@ -23,6 +23,33 @@ namespace SisAt.Repository.Persistence
             throw new NotImplementedException();
         }
 
+        public async Task AtualizarAgendamentosJobAsync()
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                List<Agendamento> agendamentos = await _context.Agendamentos.Where(x => x.DataMarcada.Date < DateTime.Now.Date && x.ConfirmarAgendamento == null).ToListAsync();
+
+                if (agendamentos != null || agendamentos.Count > 0)
+                {
+                    foreach (var agendamento in agendamentos)
+                    {
+                        agendamento.ConfirmarAgendamento = false;
+                        _context.Agendamentos.Update(agendamento);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         public async Task<Agendamento> CadastrarAgendamentoAsync(Agendamento agendamento)
         {
             try

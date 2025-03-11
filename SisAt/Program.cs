@@ -1,6 +1,8 @@
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using SisAt.API;
 using SisAt.DataBase;
+using SisAt.Jobs;
 using SisAt.Repository.Persistence;
 using SisAt.Repository.Persistence.Interfaces;
 using SisAt.Sessao;
@@ -11,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SISAT")));
+builder.Services.AddHangfire(configuration => configuration.UseSimpleAssemblyNameTypeSerializer().UseRecommendedSerializerSettings().UseSqlServerStorage(builder.Configuration.GetConnectionString("SISAT")));
+builder.Services.AddHangfireServer();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<ICadastroDeHorariosPersistence, CadastroDeHorariosPersistence>();
@@ -28,7 +33,6 @@ builder.Services.AddSession(options => { options.IdleTimeout = TimeSpan.FromDays
 
 var app = builder.Build();
 
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -36,7 +40,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStatusCodePagesWithRedirects("/Error/{0}");
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangFireAuthorizationFilter() }
+});
+HangFireJobs.Jobs();
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();

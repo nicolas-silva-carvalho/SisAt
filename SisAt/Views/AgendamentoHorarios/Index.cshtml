@@ -281,24 +281,6 @@
                     }
                 });
             },
-            datesSet: function(info) {
-                console.log("pulei o mes");
-                var mesAtual = info.view.currentStart.getMonth() + 1;
-                console.log(mesAtual);
-                var anoAtual = info.view.currentStart.getFullYear();
-                $.ajax({
-                    url: '@Url.Action("AgendamentosPorMes", "Agendamento", new { mes = "__mes__" })'.replace('__mes__', mesAtual),
-                    type: 'GET',
-                    success: function(response) {
-                        calendar.removeAllEvents();
-                        calendar.addEventSource(response);
-                    },
-                    error: function(error) {
-
-                    }
-                });
-
-            },
             editable  : true,
             droppable : true,
           });
