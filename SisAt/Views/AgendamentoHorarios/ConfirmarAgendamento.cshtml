@@ -16,10 +16,10 @@
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" style="font-weight:500;color:#6c757d!important">@ViewBag.NomeUsuario</a>
+                <a class="nav-link" style="font-weight:500;color:#6c757d!important">@User.Identity?.Name</a>
             </li>
             <li class="nav-item">
-                <a role="button" class="nav-link" style="font-weight:400;color:#6c757d!important" asp-action="Sair" asp-controller="Home"><i class="fas fa-sign-out-alt" style="margin-right:4px"></i> Sair</a>
+                <a role="button" class="nav-link" style="font-weight:400;color:#6c757d!important" asp-action="Logout" asp-controller="Home"><i class="fas fa-sign-out-alt" style="margin-right:4px"></i> Sair</a>
             </li>
         </ul>
     </nav>

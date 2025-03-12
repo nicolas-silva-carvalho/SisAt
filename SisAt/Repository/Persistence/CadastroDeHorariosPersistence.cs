@@ -209,8 +209,8 @@ namespace SisAt.Repository.Persistence
             var minutos = DateTime.Now.Minute.ToString("D2");
             string horaMinuto = $"{hora}:{minutos}";
 
-            if (string.Compare(agendamento.CadastroDeHorarios.Hora, horaMinuto) >= 0)
-            {
+            //if (string.Compare(agendamento.CadastroDeHorarios.Hora, horaMinuto) >= 0)
+            //{
                 agendamento.ConfirmarAgendamento = true;
                 _context.Agendamentos.Update(agendamento);
                 await _context.SaveChangesAsync();
@@ -225,7 +225,7 @@ namespace SisAt.Repository.Persistence
                 var response = await _importacao.CriacaoDeSenha(agendamento.ServicoId, agendamento.Nome);
                 var senha = _mapper.Map<Models.ViewModel.Senha>(response.dados.senha);
                 return senha;
-            }
+            //}
 
             return null;
         }

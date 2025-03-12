@@ -194,7 +194,7 @@ public class AgendamentoHorariosController : Controller
 
             if (senha == null)
             {
-                TempData["Error"] = "Houve um erro ao confirmar a senha.";
+                TempData["Error"] = "Para confirmar um atendimento é necessário confirma-lo antes do horario agendado.";
                 return RedirectToAction("ConfirmarAgendamento", "AgendamentoHorarios");
             }
 
@@ -206,10 +206,5 @@ public class AgendamentoHorariosController : Controller
         {
             throw new Exception(ex.Message);
         }
-    }
-
-    public IActionResult Senha(SenhaViewlModel senha)
-    {
-        return View(senha);
     }
 }

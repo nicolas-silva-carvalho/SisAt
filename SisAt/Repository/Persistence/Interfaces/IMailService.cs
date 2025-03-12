@@ -1,4 +1,4 @@
-﻿namespace SisAt.Repository.Persistence
+﻿namespace SisAt.Repository.Persistence.Interfaces
 {
     public interface IMailService
     {

@@ -1,4 +1,4 @@
-﻿namespace SisAt.API
+﻿namespace SisAt.API.ModelsAPI
 {
     public class SenhaDadosApi
     {

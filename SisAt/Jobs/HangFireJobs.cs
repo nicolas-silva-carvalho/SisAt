@@ -8,7 +8,7 @@ namespace SisAt.Jobs
     {
         public static void Jobs()
         {
-            RecurringJob.AddOrUpdate<IAgendamentoPersistence>("Agendamentos -> Update agendamentos que não confirmaram.", x => x.AtualizarAgendamentosJobAsync(), Cron.Minutely());
+            RecurringJob.AddOrUpdate<IAgendamentoPersistence>("Agendamentos -> Update agendamentos que não confirmaram.", x => x.AtualizarAgendamentosJobAsync(), Cron.Daily());
         }
     }
 }

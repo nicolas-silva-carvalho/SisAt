@@ -118,10 +118,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-primary">
+                <div class="card card-dark">
+                    <div class="card-header">Agenda do Mês:</div>
                     <div class="card-body p-0">
                         <div id="calendar" style="width:100%;"></div>
                     </div>
+                    <div class="card-footer"></div>
                 </div>
 
                 <input type="hidden" id="eventosData" name="eventos" value="@ViewBag.Calendario"/>
@@ -222,7 +224,7 @@
             locale: 'pt-br',
             allDayText: 'Dia Inteiro',
             headerToolbar: {
-              left  : 'prev,next today',
+              left  : '',
               center: 'title',
               right : 'dayGridMonth,timeGridWeek,timeGridDay'
             },

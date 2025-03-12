@@ -146,10 +146,10 @@
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" style="font-weight:500;color:#6c757d!important">@ViewBag.NomeUsuario</a>
+                <a class="nav-link" style="font-weight:500;color:#6c757d!important">@User.Identity?.Name</a>
             </li>
             <li class="nav-item">
-                <a role="button" class="nav-link" style="font-weight:400;color:#6c757d!important" asp-action="Sair" asp-controller="Home"><i class="fas fa-sign-out-alt" style="margin-right:4px"></i> Sair</a>
+                <a role="button" class="nav-link" style="font-weight:400;color:#6c757d!important" asp-action="Logout" asp-controller="Home"><i class="fas fa-sign-out-alt" style="margin-right:4px"></i> Sair</a>
             </li>
         </ul>
     </nav>
@@ -382,58 +382,58 @@
 
                 var selectedDate = moment();
                 selectedDate = selectedDate.format('L');
+                var id = $("#id").val();
+                if (id) {
+                    $.ajax({
+                        url: '@Url.Action("Horarios", "AgendamentoHorarios", new { id = "__id__" })'.replace('__id__', id) + '?data=' + selectedDate,
+                        type: 'GET',
+                        success: function (response) {
+                            if (response.success) {
+                                $("#dia").text('Data: ' + selectedDate);
+                                var container = $("#horarios-container");
+                                container.empty();
+                                if (response.horarios && response.horarios.length > 0) {
+                                    let count = 0;
+                                    let rowHtml = '';
 
-                $.ajax({
-                    url: '@Url.Action("Horarios", "AgendamentoHorarios", new { id = "__id__" })'.replace('__id__', id) + '?data=' + selectedDate,
-                    type: 'GET',
-                    success: function (response) {
-                        if (response.success) {
-                            // toastr.success('Horários carregados com sucesso!', 'Sucesso.', { closeButton: true, progressBar: true });
-                            $("#dia").text('Data: ' + selectedDate);
-                            var container = $("#horarios-container");
-                            container.empty();
+                                    rowHtml += "<div class='row text-center mx-0'>";
 
-                            if (response.horarios && response.horarios.length > 0) {
-                                let count = 0;
-                                let rowHtml = '';
+                                    response.horarios.forEach(function (horario, index) {
+                                        console.log(horario.disponivel);
+                                        if (horario.disponivel === true) {
+                                            rowHtml += "<div class='col-md-2 col-4 my-1 px-2'>" +
+                                                        "<div class='cell py-1' value ='" + horario.id +"' data-hora='" + horario.hora + "' data-id='" + horario.id + "'>" + horario.hora + "</div></div>";
+                                        } else {
+                                            rowHtml += "<div class='col-md-2 col-4 my-1 px-2'>" +
+                                                        "<div class='cell py-1 select disabled' style='cursor: auto;' disabled readonly value ='" + horario.id +"' data-hora='" + horario.hora + "' data-id='" + horario.id + "'>" + horario.hora + "</div></div>";
+                                        }
 
-                                rowHtml += "<div class='row text-center mx-0'>";
+                                        count++;
+                                        if (count % 6 === 0) {
+                                            rowHtml += "</div><div class='row text-center mx-0'>";
+                                        }
+                                    });
 
-                                response.horarios.forEach(function (horario, index) {
+                                    rowHtml += "</div>";
+                                    container.html(rowHtml);
 
-                                    if (horario.disponivel == true) {
-                                        rowHtml += "<div class='col-md-2 col-4 my-1 px-2'>" +
-                                                    "<div class='cell py-1' value ='" + horario.id +"' data-hora='" + horario.hora + "' data-id='" + horario.id + "'>" + horario.hora + "</div></div>";
-                                    } else {
-                                        rowHtml += "<div class='col-md-2 col-4 my-1 px-2'>" +
-                                                    "<div class='cell py-1 select disabled' style='cursor: auto;' disabled readonly value ='" + horario.id +"' data-hora='" + horario.hora + "' data-id='" + horario.id + "'>" + horario.hora + "</div></div>";
-                                    }
-
-                                    count++;
-                                    if (count % 6 === 0) {
-                                        rowHtml += "</div><div class='row text-center mx-0'>";
-                                    }
-                                });
-
-                                rowHtml += "</div>";
-                                container.html(rowHtml);
-
-                                $("#horariosContainer").show();
+                                    $("#horariosContainer").show();
+                                } else {
+                                    $("#horariosContainer").hide();
+                                    console.log("aq");
+                                    toastr.warning('Nenhum horário disponível para este serviço.', 'Aviso', { closeButton: true, progressBar: true });
+                                }
                             } else {
                                 $("#horariosContainer").hide();
-                                console.log("aq");
-                                toastr.warning('Nenhum horário disponível para este serviço.', 'Aviso', { closeButton: true, progressBar: true });
+                                toastr.error('Nenhum horário disponível para este serviço.', 'Erro.', { closeButton: true, progressBar: true });
                             }
-                        } else {
-                            $("#horariosContainer").hide();
-                            toastr.error('Nenhum horário disponível para este serviço.', 'Erro.', { closeButton: true, progressBar: true });
+                        },
+                        error: function () {
+                            toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
+                            console.log("estou aqui");
                         }
-                    },
-                    error: function () {
-                        toastr.error('Erro ao carregar os horários.', 'Erro.', { closeButton: true, progressBar: true });
-                        console.log("estou aqui");
-                    }
-                });
+                    });
+                }
             });
         </script>
     }

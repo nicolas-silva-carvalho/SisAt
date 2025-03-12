@@ -1,26 +1,20 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SisAt.Helper;
 using SisAt.Models;
 using SisAt.Models.ViewModel;
 using SisAt.Repository.Persistence.Interfaces;
-using SisAt.Sessao;
 
 namespace SisAt.Controllers;
 
 public class HomeController : Controller
 {
-    public readonly ISessaoFactory _sessao;
-    public readonly IUsuarioPersistence _usuario;
     public readonly IMapper _mapper;
     private readonly SignInManager<Usuario> _signInManager;
     private readonly UserManager<Usuario> _userManager;
 
-    public HomeController(ISessaoFactory sessao, IUsuarioPersistence usuario, IMapper mapper, SignInManager<Usuario> signInManager, UserManager<Usuario> userManager)
+    public HomeController(IMapper mapper, SignInManager<Usuario> signInManager, UserManager<Usuario> userManager)
     {
-        _sessao = sessao;
-        _usuario = usuario;
         _mapper = mapper;
         _signInManager = signInManager;
         _userManager = userManager;
@@ -82,7 +76,7 @@ public class HomeController : Controller
             {
                 if (model.Senha != model.ConfirmarSenha)
                 {
-                    ModelState.AddModelError(string.Empty, "As senhas não coincidem.");
+                    TempData["Error"] = "As senhas não coincidem.";
                     return View(model);
                 }
 
@@ -99,7 +93,7 @@ public class HomeController : Controller
                 {
                     foreach (var error in result.Errors)
                     {
-                        TempData["Error"] = error;
+                        TempData["Error"] = error.Description;
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
@@ -109,7 +103,6 @@ public class HomeController : Controller
         }
         catch (Exception ex)
         {
-
             throw new Exception($"Erro {ex.Message}");
         }
     }

@@ -3,16 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using SisAt.API;
-using SisAt.Filtros;
 using SisAt.Models;
 using SisAt.Models.ViewModel;
-using SisAt.Repository.Persistence;
 using SisAt.Repository.Persistence.Interfaces;
-using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace SisAt.Controllers;
-[FiltroLimparCache]
 public class AgendamentoController : Controller
 {
     public readonly IImportacaoAPIService _importacao;

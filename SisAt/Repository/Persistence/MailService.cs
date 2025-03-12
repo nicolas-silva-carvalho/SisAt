@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using SisAt.Repository.Persistence.Interfaces;
 using SisAt.Settings;
 
 namespace SisAt.Repository.Persistence
