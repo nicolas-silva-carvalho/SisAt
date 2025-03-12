@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SisAt.Helper;
 using SisAt.Models;
@@ -13,40 +14,48 @@ public class HomeController : Controller
     public readonly ISessaoFactory _sessao;
     public readonly IUsuarioPersistence _usuario;
     public readonly IMapper _mapper;
+    private readonly SignInManager<Usuario> _signInManager;
+    private readonly UserManager<Usuario> _userManager;
 
-    public HomeController(ISessaoFactory sessao, IUsuarioPersistence usuario, IMapper mapper)
+    public HomeController(ISessaoFactory sessao, IUsuarioPersistence usuario, IMapper mapper, SignInManager<Usuario> signInManager, UserManager<Usuario> userManager)
     {
         _sessao = sessao;
         _usuario = usuario;
         _mapper = mapper;
+        _signInManager = signInManager;
+        _userManager = userManager;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string returnUrl = null)
     {
         Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private";
         Response.Headers["Pragma"] = "no-cache";
         Response.Headers["Expires"] = "0";
+        ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Index(UsuarioRequestDto login)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Index(UsuarioRequestDto login, string returnUrl = null)
     {
         try
         {
+            returnUrl ??= Url.Content("~/AgendamentoHorarios");
+
             if (ModelState.IsValid)
             {
-                var usuarioBanco = await _usuario.BuscarUsuarioPorEmailESenhaAsync(login.Email, login.Senha.GerarHash());
-                
-                if (usuarioBanco != null)
+                var user = await _userManager.FindByNameAsync(login.Email);
+                if (user != null)
                 {
-                    if (usuarioBanco.SenhaValida(login.Senha))
+                    var result = await _signInManager.PasswordSignInAsync(user, login.Senha, false, false);
+                    if (result.Succeeded)
                     {
-                        _sessao.CriarSessao(usuarioBanco);
-                        return RedirectToAction("Index", "AgendamentoHorarios");
+                        ViewBag.NomeUsuario = user.Nome;
+                        return RedirectToLocal(returnUrl);
                     }
                 }
-                TempData["Error"] = "Usuário ou senha inválidas.";
+                TempData["Error"] = "Login ou senha inválidos.";
             }
 
             return View(login);
@@ -64,26 +73,39 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> RegistrarUsuario(RegistrarUsuarioRequestDto registrarUsuario)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegistrarUsuario(RegistrarUsuarioRequestDto model)
     {
         try
         {
             if (ModelState.IsValid)
             {
-                if (registrarUsuario.Senha == registrarUsuario.ConfirmarSenha)
+                if (model.Senha != model.ConfirmarSenha)
                 {
-                    var usuario = _mapper.Map<Usuario>(registrarUsuario);
-                    await _usuario.CriarUsuarioAsync(usuario);
-                    TempData["Sucesso"] = "Usuário cadastrado com sucesso";
-                    return RedirectToAction("Index", "Home");
+                    ModelState.AddModelError(string.Empty, "As senhas não coincidem.");
+                    return View(model);
                 }
 
-                TempData["Error"] = "Senhas diferentes. Por favor confirma a senha.";
-                return View(registrarUsuario);
+                var user = new Usuario { UserName = model.Email, Email = model.Email, Nome = model.Nome };
+                var result = await _userManager.CreateAsync(user, model.Senha);
+
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    return RedirectToAction("Index", "AgendamentoHorarios");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        TempData["Error"] = error;
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
-            return View(registrarUsuario);
-
+            return View(model);
         }
         catch (Exception ex)
         {
@@ -92,9 +114,19 @@ public class HomeController : Controller
         }
     }
 
-    public IActionResult Sair()
+    public async Task<IActionResult> Logout()
     {
-        _sessao.RemoverSessaoPorId();
-        return RedirectToAction("Index", "Home");
+        await _signInManager.SignOutAsync();
+        Response.Cookies.Delete(".AspNetCore.Identity.Application");
+        return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    private IActionResult RedirectToLocal(string returnUrl)
+    {
+        if (Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+        return RedirectToAction(nameof(HomeController.Index), "Home");
     }
 }

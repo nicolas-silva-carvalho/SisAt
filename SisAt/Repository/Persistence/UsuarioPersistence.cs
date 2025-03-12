@@ -22,7 +22,7 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                var usuario = await _context.Usuarios.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower() && x.Senha == senha);
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
                 if (usuario == null) return null;
 
                 return usuario;
@@ -38,7 +38,7 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                usuario.SetaSenhaHash();
+                //usuario.SetaSenhaHash();
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
 

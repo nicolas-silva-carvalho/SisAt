@@ -1,8 +1,10 @@
 using Hangfire;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SisAt.API;
 using SisAt.DataBase;
 using SisAt.Jobs;
+using SisAt.Models;
 using SisAt.Repository.Persistence;
 using SisAt.Repository.Persistence.Interfaces;
 using SisAt.Sessao;
@@ -12,7 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SISAT")));
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddDbContext<Context>(options => options.UseSqlite(builder.Configuration.GetConnectionString("SISAT")));
+
+builder.Services.AddIdentity<Usuario, IdentityRole<long>>()
+    .AddEntityFrameworkStores<Context>()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddHangfire(configuration => configuration.UseSimpleAssemblyNameTypeSerializer().UseRecommendedSerializerSettings().UseSqlServerStorage(builder.Configuration.GetConnectionString("SISAT")));
 builder.Services.AddHangfireServer();
 
@@ -52,6 +62,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

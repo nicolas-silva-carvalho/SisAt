@@ -1,35 +1,37 @@
-﻿using SisAt.Helper;
+﻿using Microsoft.AspNetCore.Identity;
+using SisAt.Helper;
 
 namespace SisAt.Models
 {
-    public class Usuario
+    public class Usuario : IdentityUser<long>
     {
-        public int Id { get; set; }
+        public List<IdentityRole<long>>? Roles { get; set; }
+        //public int Id { get; set; }
         public string Nome { get; set; }
         public string Email { get; set; }
-        public string Senha { get; set; }
-        public bool Ativo { get; set; }
+        //public string Senha { get; set; }
+        //public bool Ativo { get; set; }
 
-        public bool SenhaValida(string senha)
-        {
-            return Senha == senha.GerarHash();
-        }
+        //public bool SenhaValida(string senha)
+        //{
+        //    return Senha == senha.GerarHash();
+        //}
 
-        public void SetaSenhaHash()
-        {
-            Senha = Senha.GerarHash();
-        }
+        //public void SetaSenhaHash()
+        //{
+        //    Senha = Senha.GerarHash();
+        //}
 
-        public void SetNovaSenha(string novaSenha)
-        {
-            Senha = novaSenha.GerarHash();
-        }
+        //public void SetNovaSenha(string novaSenha)
+        //{
+        //    Senha = novaSenha.GerarHash();
+        //}
 
-        public string GerarNovaSenha()
-        {
-            string novaSenha = Guid.NewGuid().ToString().Substring(0, 8);
-            Senha = novaSenha.GerarHash();
-            return novaSenha;
-        }
+        //public string GerarNovaSenha()
+        //{
+        //    string novaSenha = Guid.NewGuid().ToString().Substring(0, 8);
+        //    Senha = novaSenha.GerarHash();
+        //    return novaSenha;
+        //}
     }
 }
