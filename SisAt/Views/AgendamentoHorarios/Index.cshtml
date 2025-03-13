@@ -261,6 +261,7 @@
                             headerModal.classList.remove('bg-dark', 'bg-danger');
                             headerModal.classList.add('bg-success');
                             inputConfirmacao.checked = true;
+                            divConfirmacao.classList.remove('icheck-danger');
                             divConfirmacao.classList.add('icheck-success');
                             confirmacaoText.innerHTML = "Agendamento Confirmado: ";
                         }
@@ -273,6 +274,7 @@
                         else if (confirmacao === false) {
                             headerModal.classList.remove('bg-dark', 'bg-success');
                             headerModal.classList.add('bg-danger');
+                            divConfirmacao.classList.remove('icheck-success');
                             divConfirmacao.classList.add('icheck-danger');
                             confirmacaoText.innerHTML = "Agendamento Não Confirmação: ";
                             inputConfirmacao.checked = true;
