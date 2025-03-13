@@ -19,7 +19,10 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
-    options.LoginPath = "/";
+    options.LoginPath = "Home/Index";
+    options.LogoutPath = "/Home/Logout";
+    options.AccessDeniedPath = "/Home/AcessoNegado";
+    options.ReturnUrlParameter = "Home";
 });
 
 builder.Services.AddAuthorization();
@@ -32,6 +35,8 @@ builder.Services.AddIdentity<Usuario, IdentityRole<long>>(options =>
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
 }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders().AddErrorDescriber<LocalizedIdentityErrorDescriber>();
+
+builder.Services.AddAntiforgery(o => o.SuppressXFrameOptionsHeader = true);
 
 builder.Services.AddHangfire(configuration => configuration.UseSimpleAssemblyNameTypeSerializer().UseRecommendedSerializerSettings().UseSqlServerStorage(builder.Configuration.GetConnectionString("SISAT")));
 builder.Services.AddHangfireServer();

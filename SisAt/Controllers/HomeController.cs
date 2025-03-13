@@ -110,7 +110,14 @@ public class HomeController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        Response.Cookies.Delete(".AspNetCore.Identity.Application");
+
+        Response.Cookies.Append(".AspNetCore.Identity.Application", "", new CookieOptions
+        {
+            Expires = DateTime.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        });
         return RedirectToAction(nameof(HomeController.Index), "Home");
     }
 
@@ -121,5 +128,10 @@ public class HomeController : Controller
             return Redirect(returnUrl);
         }
         return RedirectToAction(nameof(HomeController.Index), "Home");
+    }
+
+    public IActionResult AcessoNegado()
+    {
+        return View();
     }
 }

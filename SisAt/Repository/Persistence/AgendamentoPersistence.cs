@@ -132,7 +132,7 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf && x.DataMarcada.Date == DateTime.Now.Date && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios).Order();
+                var agendamentos = _context.Agendamentos.Where(x => x.Protocolo == protocolo || x.CpfCnpj == cpf && x.DataMarcada.Date == DateTime.Now.Date && x.ConfirmarAgendamento == null).Include(x => x.CadastroDeHorarios);
                 return await agendamentos.ToListAsync();
             }
             catch (Exception ex)
