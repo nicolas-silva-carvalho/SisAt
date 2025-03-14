@@ -154,8 +154,8 @@ public class AccountController : Controller
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var resetLink = Url.Action("RedefinirSenha", "Account", new { token = token, email = model.Email }, Request.Scheme);
 
-                await _emailSender.SendMailAsync(user.Nome, model.Email, "Redefinir Senha",
-                    $"Clique aqui para redefinir sua senha: {resetLink}");
+                var body = Template(resetLink);
+                await _emailSender.SendMailAsync(user.Nome, model.Email, "Redefinir Senha", Template(resetLink));
 
                 TempData["Sucesso"] = $"Um link de redefinição de senha foi enviado para o e-mail: {model.Email}.";
                 return View();
@@ -196,5 +196,111 @@ public class AccountController : Controller
             }
         }
         return View(model);
+    }
+
+    public string Template(string url)
+    {
+        string mailBody = @$"
+        <style>
+            .button-50 {{
+  appearance: button;
+  background-color: #000;
+  background-image: none;
+  border: 1px solid #000;
+  border-radius: 4px;
+  box-shadow: #fff 4px 4px 0 0,#000 4px 4px 0 1px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: ITCAvantGardeStd-Bk,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 0 5px 10px 0;
+  overflow: visible;
+  padding: 12px 40px;
+  text-align: center;
+  text-transform: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+}}
+
+.button-50:focus {{
+  text-decoration: none;
+}}
+
+.button-50:hover {{
+  text-decoration: none;
+}}
+
+.button-50:active {{
+  box-shadow: rgba(0, 0, 0, .125) 0 3px 5px inset;
+  outline: 0;
+}}
+
+.button-50:not([disabled]):active {{
+  box-shadow: #fff 2px 2px 0 0, #000 2px 2px 0 1px;
+  transform: translate(2px, 2px);
+}}
+
+@media (min-width: 768px) {{
+  .button-50 {{
+    padding: 12px 50px;
+  }}
+}}
+        </style>
+        <div>
+             <table border='0' cellpadding='0' cellspacing='0' width='555' style='background-color:#e4e4e4;margin-left:auto;margin-right:auto'>
+                <tbody>
+                    <tr>
+                        <td>
+                            <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                                <tbody>
+                                    <tr>
+                                        <td align='center' valign='top' colspan='4'><img tabindex='0'>
+                                            <div class='a6S' dir='ltr' style='opacity: 0.01; left: 507px; top: 102px;'>
+                                                <div id=':481' class='T-I J-J5-Ji aQv T-I-ax7 L3 a5q' role='button' tabindex='0' aria-label='' data-tooltip-class='a1V' data-tooltip=''>
+                                                    <div class='aSK J-J5-Ji aYr'>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table cellpadding='0' cellspacing='0' width='555' border='0'>
+                                <tbody>
+                                    <tr>
+                                        <td width='15'>&nbsp;</td>
+                                        <td style='background-color:#ffffff'>
+                                            <table cellpadding='0' cellspacing='0' width='100%' border='0'>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style='padding-top:15px;padding-bottom:15px;padding-left:30px;font-size:14px;font-family:Tahoma,Arial,Sans-Serif' class='style1'><H2>Redefinição de Senha</H2><tr> 
+                                                        <td align='center' valign='top'>__________________________________________________________________</td></tr></td><td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style='padding-left:30px;padding-bottom:20px;font-size:13px;font-family:Tahoma,Arial,Sans-Serif'>Clique aqui para redefinir sua senha:<a style='margin-left:12px;text-decoration:none;' role='button' class='button-50' href='{url}'>REDEFINIR SENHA</a></td>
+                                                    </tr>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    <td width='15'>&nbsp;</td>
+                                </tr>
+                            <tr>
+                        <td colspan='3' height='15'>&nbsp;</td>
+                    </tr>       
+                </tbody>
+            </table>
+            </td></tr>
+            </tbody>
+            </table>
+            <div class='yj6qo'></div><div class='adL'></div></div>";
+        return mailBody;
     }
 }
