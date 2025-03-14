@@ -4,7 +4,7 @@ namespace SisAt.Models.ViewModel
 {
     public class RecuperarSenhaViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "É obrigatório informar um e-mail.")]
         [EmailAddress]
         public string Email { get; set; }
     }

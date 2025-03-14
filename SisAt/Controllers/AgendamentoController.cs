@@ -33,6 +33,7 @@ public class AgendamentoController : Controller
             Response.Headers["Pragma"] = "no-cache";
             Response.Headers["Expires"] = "0";
             ViewBag.MenuAtivo = "Inicio";
+            ViewData["OcultarMenu"] = false;
             var servicos = await _importacao.ServicosApiResponse();
             var servicosMap = _mapper.Map<List<ServicoViewModel>>(servicos.dados);
             ViewBag.Servicos = new SelectList(servicosMap, "id", "nome");

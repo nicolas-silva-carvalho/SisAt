@@ -11,9 +11,9 @@
         <div class="card">
             <div class="card-body register-card-body">
                 <p class="login-box-msg">Registro de usuário</p>
-                <form method="post" asp-action="RegistrarUsuario" asp-controller="Home">
+                <form method="post" asp-action="RegistrarUsuario" asp-controller="Account">
                     <div class="input-group mb-3">
-                        <input type="text" asp-for="Nome" class="form-control @(ViewData.ModelState["Nome"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Nome completo">
+                        <input type="text" asp-for="Nome" id="Nome" class="form-control @(ViewData.ModelState["Nome"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Nome completo">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-user"></span>
@@ -22,7 +22,7 @@
                         @Html.ValidationMessageFor(x => x.Nome, "", new { @class = "invalid-feedback" })
                     </div>
                     <div class="input-group mb-3">
-                        <input type="email" asp-for="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Email">
+                        <input type="email" asp-for="Email" id="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Email">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -31,7 +31,7 @@
                         @Html.ValidationMessageFor(x => x.Email, "", new { @class = "invalid-feedback" })
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" asp-for="Senha" class="form-control @(ViewData.ModelState["Senha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="A senha deve conter 6 ou mais caracteres.">
+                        <input type="password" asp-for="Senha" id="Senha" class="form-control @(ViewData.ModelState["Senha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="A senha deve conter 6 ou mais caracteres.">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -39,18 +39,8 @@
                         </div>
                         @Html.ValidationMessageFor(x => x.Senha, "", new { @class = "invalid-feedback" })
                     </div>
-
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                            {
-                            <span class="is-invalid invalid-feedback field-validation-error">@error.ErrorMessage</span>
-                                
-                            }
-                    }
-
                     <div class="input-group mb-3">
-                        <input type="password" asp-for="ConfirmarSenha" class="form-control @(ViewData.ModelState["ConfirmarSenha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Confirme a sua senha. As senhas devem ser iguais.">
+                        <input type="password" asp-for="ConfirmarSenha" id="ConfirmarSenha" class="form-control @(ViewData.ModelState["ConfirmarSenha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Confirme a sua senha. As senhas devem ser iguais.">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -94,4 +84,32 @@
             });
         </script>
     }
+
+    <script>
+        $(document).ready(function() {
+            $('#Nome').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#Email').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#Senha').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#ConfirmarSenha').on('change', function () {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
 }
