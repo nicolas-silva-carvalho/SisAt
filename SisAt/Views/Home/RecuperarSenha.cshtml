@@ -13,7 +13,7 @@
                 <p class="login-box-msg">Você esqueceu sua senha? Aqui você pode facilmente recuperar uma nova senha.</p>
                 <form asp-action="RecuperarSenha" asp-controller="Home" method="post">
                     <div class="input-group mb-3">
-                        <input type="email" asp-for="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Email">
+                        <input type="email" asp-for="Email" id="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Email">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -28,19 +28,20 @@
                     </div>
                 </form>
                 <p class="mt-3 mb-1">
-                    <a asp-action="Index" asp-controller="Home">Login</a>
+                    <a class="text-dark" asp-action="Index" asp-controller="Home">Login</a>
                 </p>
                 <p class="mb-0">
-                    <a asp-action="RegistrarUsuario" asp-controller="Home" class="text-center">Registrar novo usuário</a>
+                    <a class="text-dark" asp-action="RegistrarUsuario" asp-controller="Home" class="text-center">Registrar novo usuário</a>
                 </p>
             </div>
         </div>
     </div>
 </section>
+
 @section Scripts {
     @{
         var toastrMessage = TempData["Error"] as string;
-        var toastrMessageSuccess = TempData["ToastrMessageSuccess"] as string;
+        var toastrMessageSuccess = TempData["Sucesso"] as string;
     }
 
     @if (!string.IsNullOrEmpty(toastrMessage))
@@ -59,6 +60,10 @@
             toastr.success('@toastrMessageSuccess', 'Sucesso.', {
                 closeButton: true,
                 progressBar: true
+            });
+
+            $(document).ready(function () {
+                $("#Email").val('');
             });
         </script>
     }

@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using SisAt.Models;
 using SisAt.Models.ViewModel;
@@ -158,11 +157,11 @@ public class HomeController : Controller
                 await _emailSender.SendMailAsync(user.Nome,model.Email, "Redefinir Senha",
                     $"Clique aqui para redefinir sua senha: {resetLink}");
 
-                ViewBag.Message = "Se um usuário com esse e-mail existir, um link de redefinição de senha será enviado.";
+                TempData["Sucesso"] = $"Um link de redefinição de senha foi enviado para o e-mail: {model.Email}.";
                 return View();
             }
 
-            ViewBag.Message = "Se um usuário com esse e-mail existir, um link de redefinição de senha será enviado.";
+            TempData["Error"] = $"Não foi encontrado um usuário com o e-mail: {model.Email}.";
             return View();
         }
         return View(model);
@@ -181,13 +180,14 @@ public class HomeController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByNameAsync(model.Email);
             if (user != null)
             {
                 var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Senha);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Login");
+                    TempData["Sucesso"] = "Senha alterada com sucesso.";
+                    return RedirectToAction("Index", "Home");
                 }
                 foreach (var error in result.Errors)
                 {

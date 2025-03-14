@@ -19,10 +19,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 {
-    options.LoginPath = "Home/Index";
-    options.LogoutPath = "/Home/Logout";
-    options.AccessDeniedPath = "/Home/AcessoNegado";
-    options.ReturnUrlParameter = "Home";
+    options.LoginPath = new PathString("Home/");
 });
 
 builder.Services.AddAuthorization();
