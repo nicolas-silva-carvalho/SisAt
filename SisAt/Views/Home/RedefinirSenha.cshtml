@@ -1,9 +1,8 @@
 ﻿@using SisAt.Models.ViewModel
-@model UsuarioRequestDto;
+@model RedefinirSenhaViewModel;
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Recuperar Senha";
 }
-
 <section class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
@@ -11,19 +10,13 @@
         </div>
         <div class="card">
             <div class="card-body login-card-body">
-                <p class="login-box-msg">Login de Acesso</p>
-                <form method="post" asp-action="Index" asp-controller="Home">
+                <p class="login-box-msg">Você está a apenas um passo de sua nova senha, recupere sua senha agora.</p>
+                <form asp-action="RedefinirSenha" asp-controller="Home" method="post">
+                    <input type="hidden" asp-for="Token" />
+                    <input type="hidden" asp-for="Email" />
+
                     <div class="input-group mb-3">
-                        <input type="email" asp-for="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count() > 0 ? "is-invalid" : "")" id="Email" placeholder="Email">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
-                            </div>
-                        </div>
-                        @Html.ValidationMessageFor(x => x.Email, "", new { @class = "invalid-feedback" })
-                    </div>
-                    <div class="input-group mb-3">
-                        <input type="password" asp-for="Senha" class="form-control @(ViewData.ModelState["Senha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Senha">
+                        <input type="password" asp-for="Senha" class="form-control @(ViewData.ModelState["Senha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Nova Senha" />
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -31,33 +24,34 @@
                         </div>
                         @Html.ValidationMessageFor(x => x.Senha, "", new { @class = "invalid-feedback" })
                     </div>
-                    
+
+                    <div class="input-group mb-3">
+                        <input type="password" asp-for="ConfirmarSenha" class="form-control @(ViewData.ModelState["ConfirmarSenha"]?.Errors.Count() > 0 ? "is-invalid" : "")" placeholder="Confirmar Nova Senha" />
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(x => x.ConfirmarSenha, "", new { @class = "invalid-feedback" })
+                    </div>
+
                     <div class="row">
                         <div class="col-12">
-                            <button type="submit" class="btn btn-dark btn-block">ACESSAR O SISTEMA</button>
+                            <button type="submit" class="btn btn-dark btn-block">Alterar a senha</button>
                         </div>
                     </div>
-
-                    <div class="social-auth-links text-center mb-3">
-                        
-                    </div>
-
-                    <p class="mb-1">
-                        <a asp-controller="Home" asp-action="RecuperarSenha">Esqueci a senha</a>
-                    </p>
-                    <p class="mb-0">
-                        <a asp-controller="Home" asp-action="RegistrarUsuario" class="text-center">Registrar novo usuário</a>
-                    </p>
                 </form>
+                <p class="mt-3 mb-1">
+                    <a asp-action="Index" asp-controller="Home">Login</a>
+                </p>
             </div>
         </div>
     </div>
 </section>
-
 @section Scripts {
     @{
         var toastrMessage = TempData["Error"] as string;
-        var toastrMessageSuccess = TempData["Sucesso"] as string;
+        var toastrMessageSuccess = TempData["ToastrMessageSuccess"] as string;
     }
 
     @if (!string.IsNullOrEmpty(toastrMessage))

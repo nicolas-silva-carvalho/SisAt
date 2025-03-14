@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using SisAt.Models;
 using SisAt.Models.ViewModel;
@@ -12,12 +13,14 @@ public class HomeController : Controller
     public readonly IMapper _mapper;
     private readonly SignInManager<Usuario> _signInManager;
     private readonly UserManager<Usuario> _userManager;
+    private readonly IMailService _emailSender;
 
-    public HomeController(IMapper mapper, SignInManager<Usuario> signInManager, UserManager<Usuario> userManager)
+    public HomeController(IMapper mapper, SignInManager<Usuario> signInManager, UserManager<Usuario> userManager, IMailService emailSender)
     {
         _mapper = mapper;
         _signInManager = signInManager;
         _userManager = userManager;
+        _emailSender = emailSender;
     }
 
     public IActionResult Index(string returnUrl = null)
@@ -133,5 +136,65 @@ public class HomeController : Controller
     public IActionResult AcessoNegado()
     {
         return View();
+    }
+
+    public IActionResult RecuperarSenha()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RecuperarSenha(RecuperarSenhaViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByNameAsync(model.Email);
+            if (user != null)
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetLink = Url.Action("RedefinirSenha", "Home", new { token = token, email = model.Email }, Request.Scheme);
+
+                await _emailSender.SendMailAsync(user.Nome,model.Email, "Redefinir Senha",
+                    $"Clique aqui para redefinir sua senha: {resetLink}");
+
+                ViewBag.Message = "Se um usuário com esse e-mail existir, um link de redefinição de senha será enviado.";
+                return View();
+            }
+
+            ViewBag.Message = "Se um usuário com esse e-mail existir, um link de redefinição de senha será enviado.";
+            return View();
+        }
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult RedefinirSenha(string token, string email)
+    {
+        var model = new RedefinirSenhaViewModel { Token = token, Email = email };
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RedefinirSenha(RedefinirSenhaViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null)
+            {
+                var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Senha);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Login");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+        }
+        return View(model);
     }
 }
