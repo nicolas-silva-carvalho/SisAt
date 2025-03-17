@@ -24,6 +24,11 @@ public class AccountController : Controller
 
     public IActionResult Login(string returnUrl = null)
     {
+        if (User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "AgendamentoHorarios");
+        }
+
         Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private";
         Response.Headers["Pragma"] = "no-cache";
         Response.Headers["Expires"] = "0";
@@ -65,6 +70,11 @@ public class AccountController : Controller
 
     public IActionResult RegistrarUsuario()
     {
+        if (User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "AgendamentoHorarios");
+        }
+
         return View();
     }
 
@@ -132,13 +142,13 @@ public class AccountController : Controller
         return RedirectToAction(nameof(AccountController.Login), "Account");
     }
 
-    public IActionResult AcessoNegado()
-    {
-        return View();
-    }
-
     public IActionResult RecuperarSenha()
     {
+        if (User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "AgendamentoHorarios");
+        }
+
         return View();
     }
 
@@ -170,6 +180,11 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult RedefinirSenha(string token, string email)
     {
+        if (User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "AgendamentoHorarios");
+        }
+
         var model = new RedefinirSenhaViewModel { Token = token, Email = email };
         return View(model);
     }
