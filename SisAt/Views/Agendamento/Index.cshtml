@@ -263,6 +263,7 @@
                                     </div>
                                     <input type="hidden" id="horarioChecked" name="horarioChecked" />
                                     <input type="hidden" id="data" name="data" />
+                                    <input type="hidden" name="RequestId" value="@Guid.NewGuid()" />
                                     <div class="form-group">
                                         <button type="submit" id="salvar" class="btn btn-dark">Salvar</button>
                                     </div>
@@ -649,6 +650,28 @@
                 } else {
                     toastr.info("É necessários selecionar um serviço e uma data para selecionar os horários disponíneis.", "Informação", { closeButton: true, progressBar: true });
                 }
+            });
+        });
+    </script>
+
+    <script>
+            $(document).ready(function () {
+            $("#salvar").click(function () {
+                $.blockUI({
+                    message: `<div class="overlay-wrapper">
+                                <div class="overlay text-center">
+                                    <i class="fas fa-3x fa-sync-alt fa-spin"></i>
+                                    <div class="text-bold pt-2"> Carregando...</div>
+                                </div>
+                              </div>`,
+                    css: {
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: '#fff'
+                    }
+                });
+
+                setTimeout($.unblockUI, 20000);
             });
         });
     </script>

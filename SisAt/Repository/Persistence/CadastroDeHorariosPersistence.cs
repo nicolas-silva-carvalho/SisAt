@@ -170,7 +170,7 @@ namespace SisAt.Repository.Persistence
         {
             try
             {
-                var cadastro = await _context.CadastroDeHorarios.Where(x => x.Id == cadastroId).FirstOrDefaultAsync();
+                var cadastro = await _context.CadastroDeHorarios.Where(x => x.Id == cadastroId && x.Marcado == false).FirstOrDefaultAsync();
 
                 return cadastro;
             }
