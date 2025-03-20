@@ -60,6 +60,7 @@ public class AgendamentoController : Controller
     {
         try
         {
+            ViewData["OcultarMenu"] = false;
             if (ModelState.IsValid && horarioChecked != "[]")
             {
                 if (horarioChecked != null)
